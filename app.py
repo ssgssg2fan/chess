@@ -5,6 +5,14 @@ from tools.evaluator import evaluate_pgn
 
 app = Flask(__name__)
 
+@app.route("/evaluate", methods=["POST"])
+def evaluate():
+    file = request.files["pgn"]
+    pgn_path = os.path.join("uploads", file.filename)
+    file.save(pgn_path)
+    result_path = evaluate_pgn(pgn_path, "results")
+    return send_file(result_path, as_attachment=True)
+    
 @app.route("/")
 def index():
     return render_template("index.html")
