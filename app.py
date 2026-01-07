@@ -9,7 +9,9 @@ app = Flask(__name__)
 def evaluate():
     file = request.files["pgn"]
     pgn_path = os.path.join("uploads", file.filename)
-    file.save(pgn_path)
+    UPLOAD_DIR = "/tmp"
+    path = os.path.join(UPLOAD_DIR, file.filename)
+    file.save(path)
     result_path = evaluate_pgn(pgn_path, "results")
     return send_file(result_path, as_attachment=True)
     
