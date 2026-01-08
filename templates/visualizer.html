@@ -3,26 +3,32 @@
 <head>
     <title>Chess Visualizer</title>
     <style>
-        body { font-family: monospace; margin:20px; }
+        body { 
+            font-family: monospace; 
+            margin:20px; 
+            background-color: #808080; 
+            color: #fff; 
+        }
         #container { display:flex; }
         #board { display:grid; grid-template-columns: repeat(8, 50px); grid-gap: 0; }
+
         .cell { width:50px; height:50px; text-align:center; line-height:50px; font-size:20px; }
-        .white { background-color:#f0d9b5; }
-        .black { background-color:#b58863; color:black; }
+        .white { background-color:#eee; }
+        .black { background-color:#76a86b; color:black; }
         .highlight { background-color: yellow !important; }
         #panel { margin-left:20px; width:300px; }
         #moves { max-height:400px; overflow-y:auto; font-size:14px; }
         #evalbar { width:20px; height:300px; background:#ccc; margin:10px auto; position:relative; }
         #evalfill { width:100%; background:black; position:absolute; bottom:0; }
-        .btn { margin:5px; padding:5px 10px; }
+        .btn { margin:5px; padding:5px 10px; background-color:black; color:white; border:none; cursor:pointer; }
     </style>
 </head>
 <body>
     <h1>Chess Visualizer</h1>
     <form action="/visualize" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" required>
-    <button type="submit">Upload & Visualize</button>
-</form>
+        <input type="file" name="file" required>
+        <button type="submit">Upload & Visualize</button>
+    </form>
 
     <div id="container">
         <div id="board"></div>
@@ -37,38 +43,31 @@
 
     <script>
         const moves = {{ moves|tojson }};
-const initialFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-const pieceSymbols = {
-  'P':'♙','N':'♘','B':'♗','R':'♖','Q':'♕','K':'♔',
-  'p':'♟','n':'♞','b':'♝','r':'♜','q':'♛','k':'♚'
-};
-const board = Array(8).fill(null).map(()=>Array(8).fill(''));
+        const initialFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+        const pieceSymbols = {
+            'P':'♙','N':'♘','B':'♗','R':'♖','Q':'♕','K':'♔',
+            'p':'♟','n':'♞','b':'♝','r':'♜','q':'♛','k':'♚'
+        };
+        const board = Array(8).fill(null).map(()=>Array(8).fill(''));
 
-function setupBoard(fen){
-  const rows = fen.split('/');
-  for(let r=0;r<8;r++){
-    let f=0;
-    for(const c of rows[r]){
-      if(!isNaN(c)){
-        f+=parseInt(c);
-      }else{
-        board[7-r][f] = pieceSymbols[c];
-        f++;
-      }
-    }
-  }
-}
-setupBoard(initialFEN);
-        let cursor = 0;
-        let lastMove = null;
-
-        function initBoard() {
+        function setupBoard(fen){
+            const rows = fen.split('/');
             for(let r=0;r<8;r++){
-                for(let f=0;f<8;f++){
-                    board[r][f]='';
+                let f=0;
+                for(const c of rows[r]){
+                    if(!isNaN(c)){
+                        f+=parseInt(c);
+                    }else{
+                        board[7-r][f] = pieceSymbols[c];
+                        f++;
+                    }
                 }
             }
         }
+        setupBoard(initialFEN);
+
+        let cursor = 0;
+        let lastMove = null;
 
         function drawBoard(){
             const boardDiv = document.getElementById('board');
@@ -78,7 +77,7 @@ setupBoard(initialFEN);
                     const cell = document.createElement('div');
                     cell.className = 'cell ' + ((r+f)%2?'white':'black');
                     if(lastMove && (lastMove[0]==r && lastMove[1]==f || lastMove[2]==r && lastMove[3]==f)){
-                    cell.classList.add('highlight');
+                        cell.classList.add('highlight');
                     }
                     cell.textContent = board[r][f];
                     boardDiv.appendChild(cell);
@@ -103,17 +102,26 @@ setupBoard(initialFEN);
             const m = moves[cursor-1];
             const val = Math.max(-1,Math.min(1,m.delta/20));
             bar.style.height = ((val+1)/2*100) + '%';
-            bar.style.backgroundColor = val>=0?'black':'white';
+            bar.style.backgroundColor = val>=0?'black':'#ddd';
         }
 
         function pushMove(){
             if(cursor>=moves.length) return;
             const m = moves[cursor];
-            // 간단한 FEN 파서 없이 그냥 SAN 텍스트 표시
+            // 간단하게 SAN 첫글자 기반 임시 좌표
             const pieceChar = m.san[0];
             const color = m.color==='W'?pieceChar.toUpperCase():pieceChar.toLowerCase();
-            board[7][0]=pieceSymbols[color]||pieceSymbols['P']; // 임시 위치 표시
-            lastMove=[0,7]; // 임시
+            // FEN 파서 없이 간단 표시: 랜덤 위치 X,Y
+            let placed = false;
+            for(let r=0;r<8&&!placed;r++){
+                for(let f=0;f<8&&!placed;f++){
+                    if(board[r][f]===''){
+                        board[r][f]=pieceSymbols[color]||pieceSymbols['P'];
+                        lastMove=[r,f,r,f];
+                        placed = true;
+                    }
+                }
+            }
             cursor++;
             drawBoard(); drawMoves(); drawEvalBar();
         }
@@ -122,13 +130,16 @@ setupBoard(initialFEN);
             if(cursor<=0) return;
             cursor--;
             lastMove=null;
-            drawBoard(); drawMoves(); drawEvalBar();
-        }
-
-        function popMove(){
-            if(cursor<=0) return;
-            cursor--;
-            lastMove=null;
+            // 단순 초기화 후 다시 셋업
+            for(let r=0;r<8;r++){
+                for(let f=0;f<8;f++){
+                    board[r][f]='';
+                }
+            }
+            setupBoard(initialFEN);
+            for(let i=0;i<cursor;i++){
+                pushMove();
+            }
             drawBoard(); drawMoves(); drawEvalBar();
         }
 
@@ -138,10 +149,6 @@ setupBoard(initialFEN);
         drawBoard();
         drawMoves();
         drawEvalBar();
-    </script>
-</body>
-</html>
-
     </script>
 </body>
 </html>
