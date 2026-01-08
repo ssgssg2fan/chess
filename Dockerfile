@@ -5,6 +5,9 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends stockfish \
  && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y nodejs npm
+RUN npm install chess.js
+
 WORKDIR /app
 
 COPY requirements.txt .
