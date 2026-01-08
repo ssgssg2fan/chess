@@ -13,7 +13,7 @@ DEPTH = 14
 MATE_SCORE = 10000
 
 # ⚠️ 웹 서버용 Stockfish 경로
-STOCKFISH_PATH = "stockfish"  # 나중에 설명함
+STOCKFISH_PATH = "/usr/games/stockfish"  # 나중에 설명함
 
 # =====================
 # 유틸
