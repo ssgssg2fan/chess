@@ -6,7 +6,7 @@
 
 <!-- chess.js 라이브러리 -->
 <script type="module">
-<script src="{{ url_for('static', filename='chess.js') }}"></script>
+<script src="{{ url_for('static', filename='chess.min.js') }}"></script>
 
 <script>
   window.MOVES = {{ moves | tojson }};
