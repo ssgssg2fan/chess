@@ -9,9 +9,15 @@
     <button onclick="location.href='/chess'">
         Chess Tool
     </button>
+<body>
+    <h1>Main Page</h1>
+
+    <button onclick="location.href='/chess'">
+        Chess Tool
+    </button>
+
+    <form action="/evaluate" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Evaluate</button>
+    </form>
 </body>
-</html>
-<form action="/evaluate" method="post" enctype="multipart/form-data">
-  <input type="file" name="file" required>
-  <button type="submit">Evaluate</button>
-</form>
