@@ -3,6 +3,11 @@ from flask import Flask, render_template, request, send_file
 from tools.chess_tool import run as chess_run
 from tools.evaluator import evaluate_pgn
 
+UPLOAD_DIR = "/tmp/uploads"
+RESULT_DIR = "/tmp/results"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(RESULT_DIR, exist_ok=True)
+
 app = Flask(__name__)
 
 @app.route("/evaluate", methods=["POST"])
@@ -26,7 +31,35 @@ def evaluate():
 
     result_path = evaluate_pgn(pgn_path, RESULT_DIR)
     return send_file(result_path, as_attachment=True)
-    
+
+@app.route("/visualize", methods=["POST"])
+def visualize():
+    if "file" not in request.files:
+        return "NO FILE", 400
+    file = request.files["file"]
+    if file.filename == "":
+        return "EMPTY FILE", 400
+
+    log_path = os.path.join(UPLOAD_DIR, file.filename)
+    file.save(log_path)
+
+    moves = []
+    pattern = re.compile(r"\d+\s+(W|B)\.\s+(\S+)\s+\[(.*?)\]")
+    with open(log_path, encoding="utf-8") as f:
+        for line in f:
+            m = pattern.search(line)
+            if m:
+                moves.append({
+                    "color": m.group(1),
+                    "san": m.group(2),
+                    "label": m.group(3),
+                    "turn": int(line.split()[0]),
+                    "delta": 0
+                })
+
+    return render_template("visualizer.html", moves=moves)
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
