@@ -5,10 +5,10 @@
     <style>
         body { font-family: monospace; margin:20px; }
         #container { display:flex; }
-        #board { display:grid; grid-template-columns: repeat(8, 60px); grid-gap: 1px; }
-        .cell { width:60px; height:60px; text-align:center; line-height:60px; font-size:36px; }
-        .white { background-color:#eee; }
-        .black { background-color:#888; color:white; }
+        #board { display:grid; grid-template-columns: repeat(8, 50px); grid-gap: 0; }
+        .cell { width:50px; height:50px; text-align:center; line-height:50px; font-size:20px; }
+        .white { background-color:#f0d9b5; }
+        .black { background-color:#b58863; color:black; }
         .highlight { background-color: yellow !important; }
         #panel { margin-left:20px; width:300px; }
         #moves { max-height:400px; overflow-y:auto; font-size:14px; }
@@ -31,17 +31,34 @@
             <div id="moves"></div>
             <button class="btn" id="prev">◀ Prev</button>
             <button class="btn" id="next">Next ▶</button>
+            <a class="btn" id="back" href="/">← Back</a>
         </div>
     </div>
 
     <script>
         const moves = {{ moves|tojson }};
-        const board = Array(8).fill(null).map(()=>Array(8).fill(''));
-        const pieceSymbols = {
-            'P':'♙','N':'♘','B':'♗','R':'♖','Q':'♕','K':'♔',
-            'p':'♟','n':'♞','b':'♝','r':'♜','q':'♛','k':'♚'
-        };
+const initialFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+const pieceSymbols = {
+  'P':'♙','N':'♘','B':'♗','R':'♖','Q':'♕','K':'♔',
+  'p':'♟','n':'♞','b':'♝','r':'♜','q':'♛','k':'♚'
+};
+const board = Array(8).fill(null).map(()=>Array(8).fill(''));
 
+function setupBoard(fen){
+  const rows = fen.split('/');
+  for(let r=0;r<8;r++){
+    let f=0;
+    for(const c of rows[r]){
+      if(!isNaN(c)){
+        f+=parseInt(c);
+      }else{
+        board[7-r][f] = pieceSymbols[c];
+        f++;
+      }
+    }
+  }
+}
+setupBoard(initialFEN);
         let cursor = 0;
         let lastMove = null;
 
@@ -60,8 +77,8 @@
                 for(let f=0;f<8;f++){
                     const cell = document.createElement('div');
                     cell.className = 'cell ' + ((r+f)%2?'white':'black');
-                    if(lastMove && (lastMove[0]==r*8+f || lastMove[1]==r*8+f)){
-                        cell.classList.add('highlight');
+                    if(lastMove && (lastMove[0]==r && lastMove[1]==f || lastMove[2]==r && lastMove[3]==f)){
+                    cell.classList.add('highlight');
                     }
                     cell.textContent = board[r][f];
                     boardDiv.appendChild(cell);
@@ -108,13 +125,23 @@
             drawBoard(); drawMoves(); drawEvalBar();
         }
 
+        function popMove(){
+            if(cursor<=0) return;
+            cursor--;
+            lastMove=null;
+            drawBoard(); drawMoves(); drawEvalBar();
+        }
+
         document.getElementById('next').onclick = pushMove;
         document.getElementById('prev').onclick = popMove;
 
-        initBoard();
         drawBoard();
         drawMoves();
         drawEvalBar();
+    </script>
+</body>
+</html>
+
     </script>
 </body>
 </html>
