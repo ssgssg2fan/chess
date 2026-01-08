@@ -9,6 +9,8 @@ app = Flask(__name__)
 def evaluate():
     if "file" not in request.files:
     return "NO FILE", 400
+    if file.filename == "":
+    return "EMPTY FILE", 400
 
     file = request.files["file"]
     pgn_path = os.path.join("uploads", file.filename)
