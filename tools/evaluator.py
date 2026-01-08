@@ -9,7 +9,7 @@ import chess.engine
 # =====================
 STRICTNESS = 6
 STRICT_DEGREE = (5 - STRICTNESS / 2) * 100
-DEPTH = 14
+DEPTH = 12
 MATE_SCORE = 10000
 
 # ⚠️ 웹 서버용 Stockfish 경로
