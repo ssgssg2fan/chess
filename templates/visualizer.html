@@ -6,12 +6,13 @@
 
 <!-- chess.js 라이브러리 -->
 <script type="module">
-  import { Chess } from "{{ url_for('static', filename='chess.js') }}";
-  window.Chess = Chess;           // 전역으로 박아준다
+<script src="{{ url_for('static', filename='chess.js') }}"></script>
+
+<script>
   window.MOVES = {{ moves | tojson }};
 </script>
 
-<script type="module" src="{{ url_for('static', filename='visualizer.js') }}"></script>
+<script src="{{ url_for('static', filename='visualizer.js') }}"></script>
   
 <style>
 body {
