@@ -8,16 +8,23 @@ app = Flask(__name__)
 @app.route("/evaluate", methods=["POST"])
 def evaluate():
     if "file" not in request.files:
-    return "NO FILE", 400
-    if file.filename == "":
-    return "EMPTY FILE", 400
+        return "NO FILE", 400
 
     file = request.files["file"]
-    pgn_path = os.path.join("uploads", file.filename)
+
+    if file.filename == "":
+        return "EMPTY FILE", 400
+
     UPLOAD_DIR = "/tmp"
-    path = os.path.join(UPLOAD_DIR, file.filename)
-    file.save(path)
-    result_path = evaluate_pgn(pgn_path, "results")
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+    pgn_path = os.path.join(UPLOAD_DIR, file.filename)
+    file.save(pgn_path)
+
+    RESULT_DIR = "/tmp/results"
+    os.makedirs(RESULT_DIR, exist_ok=True)
+
+    result_path = evaluate_pgn(pgn_path, RESULT_DIR)
     return send_file(result_path, as_attachment=True)
     
 @app.route("/")
