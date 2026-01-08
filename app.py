@@ -32,6 +32,28 @@ def evaluate():
     result_path = evaluate_pgn(pgn_path, RESULT_DIR)
     return send_file(result_path, as_attachment=True)
 
+    log_path = os.path.join(UPLOAD_DIR, file.filename)
+    file.save(log_path)
+
+    # 평가된 기보를 읽어서 moves 리스트로 변환
+    moves = []
+    import re
+    pattern = re.compile(r"\d+\s+(W|B)\.\s+(\S+)\s+\[(.*?)\]")
+    with open(log_path, encoding="utf-8") as f:
+        for line in f:
+            m = pattern.search(line)
+            if m:
+                moves.append({
+                    "turn": int(line.split()[0]),
+                    "color": m.group(1),
+                    "san": m.group(2),
+                    "label": m.group(3),
+                    "delta": 0
+                })
+
+    # moves를 HTML에 전달
+    return render_template("visualizer.html", moves=moves)
+    
 @app.route("/visualize", methods=["POST"])
 def visualize():
     if "file" not in request.files:
