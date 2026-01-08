@@ -1,3 +1,5 @@
+console.log("JS LOADED");
+console.log(moves);
 const moves = window.MOVES;
 const game = new Chess();
 let cursor = 0;
