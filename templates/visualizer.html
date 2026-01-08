@@ -4,13 +4,14 @@
     <title>Chess Visualizer</title>
     <link rel="stylesheet" href="https://unpkg.com/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
     <style>
-        body { background:#303030; color:white; font-family:monospace; }
+        body { background:#202020; color:white; font-family:monospace; }
         #board { width: 480px; margin: 20px; display:inline-block; }
-        #panel { display:inline-block; vertical-align:top; margin-left:20px; }
+        #panel { display:inline-block; vertical-align:top; margin-left:20px; width:320px; }
         #moves { max-height:400px; overflow-y:auto; font-size:16px; margin-bottom:10px; }
-        #evalbar { width:20px; height:300px; background:#eee; position:relative; margin-bottom:10px;}
+        #evalbar { width:20px; height:300px; background:#eee; position:relative; margin-bottom:10px; }
         #evalfill { width:100%; position:absolute; bottom:0; background:black; }
         .btn { padding:5px 10px; background:black; color:white; border:none; cursor:pointer; margin:2px; }
+        .highlight { background:yellow !important; }
     </style>
 </head>
 <body>
@@ -26,13 +27,12 @@
     <div id="moves"></div>
     <button class="btn" id="prev">◀ Prev</button>
     <button class="btn" id="next">Next ▶</button>
-    <a class="btn" id="back" href="/">← Back</a>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.13.4/chess.min.js"></script>
 <script src="https://unpkg.com/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
 <script>
-const moves = {{ moves|tojson }};
+const moves = {{ moves|tojson }}; // 서버에서 pgn -> move list 전달
 const LABEL_COLORS = {
     "great(star)": "green",
     "fu**n great(!!)": "gold",
@@ -41,27 +41,35 @@ const LABEL_COLORS = {
     "missed(x)": "red",
     "what(?)": "red",
     "blunder(??)": "red",
-    "ordinary(..)": "gray"
+    "ordinary(..)": "white"
 };
 
 let cursor = 0;
 let chess = new Chess();
 let board = Chessboard('board', { draggable: false, position: 'start' });
 
-function updateBoard(){
-    const move = moves[cursor-1];
-    if(move){
-        chess.move(move.san);
-        board.position(chess.fen());
-    } else {
-        chess.reset();
-        board.start();
+function updateBoard() {
+    chess.reset();
+    for (let i=0; i<cursor; i++) {
+        chess.move(moves[i].san);
     }
+    board.position(chess.fen());
     drawMoves();
     drawEval();
+    highlightLastMove();
 }
 
-function drawMoves(){
+function highlightLastMove() {
+    const squares = document.querySelectorAll('#board .square-55d63');
+    squares.forEach(sq => sq.classList.remove('highlight'));
+    if(cursor>0){
+        const moveObj = chess.history({verbose:true})[cursor-1];
+        document.querySelector(`.square-${moveObj.from}`).classList.add('highlight');
+        document.querySelector(`.square-${moveObj.to}`).classList.add('highlight');
+    }
+}
+
+function drawMoves() {
     const movesDiv = document.getElementById('moves');
     movesDiv.innerHTML='';
     moves.forEach((m,i)=>{
@@ -77,8 +85,8 @@ function drawEval(){
     const bar = document.getElementById('evalfill');
     if(cursor===0){ bar.style.height='50%'; return; }
     const val = Math.max(-1, Math.min(1, moves[cursor-1].delta/20));
-    bar.style.height=((val+1)/2*100)+'%';
-    bar.style.backgroundColor=val>=0?'black':'white';
+    bar.style.height = ((val+1)/2*100)+'%';
+    bar.style.backgroundColor = val>=0?'black':'white';
 }
 
 document.getElementById('next').onclick = ()=>{
@@ -87,9 +95,6 @@ document.getElementById('next').onclick = ()=>{
 }
 document.getElementById('prev').onclick = ()=>{
     if(cursor > 0) cursor--;
-    chess.reset();
-    for(let i=0;i<cursor;i++) chess.move(moves[i].san);
-    board.position(chess.fen());
     updateBoard();
 }
 
