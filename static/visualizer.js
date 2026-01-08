@@ -1,3 +1,4 @@
+console.log("Chess =", typeof Chess);
 const moves = window.MOVES;
 const game = new Chess();
 
