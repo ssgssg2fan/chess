@@ -1,99 +1,199 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Chess Visualizer</title>
-    <link rel="stylesheet" href="https://unpkg.com/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
-    <style>
-        body { background:#202020; color:white; font-family:monospace; }
-        #board { width: 480px; margin: 20px; display:inline-block; }
-        #panel { display:inline-block; vertical-align:top; margin-left:20px; width:320px; }
-        #moves { max-height:400px; overflow-y:auto; font-size:16px; margin-bottom:10px; }
-        #evalbar { width:20px; height:300px; background:#eee; position:relative; margin-bottom:10px; }
-        #evalfill { width:100%; position:absolute; bottom:0; background:black; }
-        .btn { padding:5px 10px; background:black; color:white; border:none; cursor:pointer; margin:2px; }
-        .highlight { background:yellow !important; }
-    </style>
-</head>
-<body>
-<h1>Chess Visualizer</h1>
-<form action="/visualize" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" required>
-    <button type="submit" class="btn">Upload & Visualize</button>
-</form>
+<meta charset="utf-8">
+<title>Chess Visualizer</title>
 
-<div id="board"></div>
-<div id="panel">
-    <div id="evalbar"><div id="evalfill"></div></div>
-    <div id="moves"></div>
-    <button class="btn" id="prev">◀ Prev</button>
-    <button class="btn" id="next">Next ▶</button>
-</div>
+<script src="/static/chess.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.13.4/chess.min.js"></script>
-<script src="https://unpkg.com/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
-<script>
-const moves = {{ moves|tojson }}; // 서버에서 pgn -> move list 전달
-const LABEL_COLORS = {
-    "great(star)": "green",
-    "fu**n great(!!)": "gold",
-    "far even heavy great(!)": "blue",
-    "good(daboong)": "green",
-    "missed(x)": "red",
-    "what(?)": "red",
-    "blunder(??)": "red",
-    "ordinary(..)": "white"
-};
-
-let cursor = 0;
-let chess = new Chess();
-let board = Chessboard('board', { draggable: false, position: 'start' });
-
-function updateBoard() {
-    chess.reset();
-    for (let i=0; i<cursor; i++) {
-        chess.move(moves[i].san);
-    }
-    board.position(chess.fen());
-    drawMoves();
-    drawEval();
-    highlightLastMove();
+<style>
+body {
+  background:#1e1e1e;
+  color:white;
+  font-family: monospace;
+  margin:20px;
 }
 
-function highlightLastMove() {
-    const squares = document.querySelectorAll('#board .square-55d63');
-    squares.forEach(sq => sq.classList.remove('highlight'));
-    if(cursor>0){
-        const moveObj = chess.history({verbose:true})[cursor-1];
-        document.querySelector(`.square-${moveObj.from}`).classList.add('highlight');
-        document.querySelector(`.square-${moveObj.to}`).classList.add('highlight');
+#container {
+  display:flex;
+  gap:20px;
+}
+
+#board {
+  display:grid;
+  grid-template-columns: repeat(8, 60px);
+  border:2px solid #000;
+}
+
+.cell {
+  width:60px;
+  height:60px;
+  text-align:center;
+  line-height:60px;
+  font-size:36px;
+}
+
+.white { background:#f0f0f0; color:black; }
+.green { background:#76a86b; color:black; }
+
+.highlight {
+  box-shadow: inset 0 0 0 4px rgba(255,255,0,0.7);
+}
+
+#panel {
+  width:260px;
+}
+
+#evalbar {
+  width:20px;
+  height:300px;
+  background:#555;
+  position:relative;
+  margin-bottom:20px;
+}
+
+#evalfill {
+  position:absolute;
+  bottom:0;
+  width:100%;
+  background:black;
+}
+
+#moves {
+  max-height:360px;
+  overflow-y:auto;
+  font-size:14px;
+}
+
+.move {
+  padding:2px 4px;
+}
+
+.move.active {
+  background:#444;
+}
+
+button {
+  background:black;
+  color:white;
+  border:1px solid #aaa;
+  padding:6px 10px;
+  margin-top:6px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Chess Visualizer</h2>
+
+<div id="container">
+  <div id="board"></div>
+
+  <div id="panel">
+    <div id="evalbar">
+      <div id="evalfill"></div>
+    </div>
+
+    <div id="moves"></div>
+
+    <button id="prev">◀ Prev</button>
+    <button id="next">Next ▶</button>
+    <br>
+    <button onclick="location.href='/'">Back</button>
+  </div>
+</div>
+
+<script>
+const moves = {{ moves|tojson }};
+
+const game = new Chess();
+let cursor = 0;
+let lastMove = null;
+
+const pieceMap = {
+  wp:"♙", wn:"♘", wb:"♗", wr:"♖", wq:"♕", wk:"♔",
+  bp:"♟", bn:"♞", bb:"♝", br:"♜", bq:"♛", bk:"♚"
+};
+
+function drawBoard() {
+  const boardDiv = document.getElementById("board");
+  boardDiv.innerHTML = "";
+
+  const pos = game.board();
+
+  for (let r = 7; r >= 0; r--) {
+    for (let f = 0; f < 8; f++) {
+      const cell = document.createElement("div");
+      const isWhite = (r + f) % 2 === 0;
+      cell.className = "cell " + (isWhite ? "white" : "green");
+
+      if (lastMove &&
+          ((lastMove.from === r*8+f) || (lastMove.to === r*8+f))) {
+        cell.classList.add("highlight");
+      }
+
+      const p = pos[r][f];
+      if (p) cell.textContent = pieceMap[p.color + p.type];
+
+      boardDiv.appendChild(cell);
     }
+  }
 }
 
 function drawMoves() {
-    const movesDiv = document.getElementById('moves');
-    movesDiv.innerHTML='';
-    moves.forEach((m,i)=>{
-        const div = document.createElement('div');
-        div.textContent=`${i+1} ${m.color}. ${m.san} [${m.label}] Δ=${m.delta}`;
-        div.style.color = LABEL_COLORS[m.label] || 'white';
-        if(i===cursor-1) div.style.background='#555';
-        movesDiv.appendChild(div);
-    });
+  const div = document.getElementById("moves");
+  div.innerHTML = "";
+
+  moves.forEach((m, i) => {
+    const d = document.createElement("div");
+    d.className = "move" + (i === cursor-1 ? " active" : "");
+    d.textContent =
+      (i%2===0 ? `${(i+2)/2}W. ` : `${(i+1)/2}B. `) +
+      m.san + `  [${m.label}]`;
+    div.appendChild(d);
+  });
 }
 
-function drawEval(){
-    const bar = document.getElementById('evalfill');
-    if(cursor===0){ bar.style.height='50%'; return; }
-    const val = Math.max(-1, Math.min(1, moves[cursor-1].delta/20));
-    bar.style.height = ((val+1)/2*100)+'%';
-    bar.style.backgroundColor = val>=0?'black':'white';
+function drawEval() {
+  const bar = document.getElementById("evalfill");
+  if (cursor === 0) {
+    bar.style.height = "50%";
+    return;
+  }
+  const d = Math.max(-10, Math.min(10, moves[cursor-1].delta));
+  bar.style.height = ((d + 10) / 20 * 100) + "%";
+  bar.style.background = d >= 0 ? "black" : "white";
 }
 
-document.getElementById('next').onclick = ()=>{
-    if(cursor < moves.length) cursor++;
-    updateBoard();
+function nextMove() {
+  if (cursor >= moves.length) return;
+  const mv = game.move(moves[cursor].san);
+  lastMove = { from: mv.from, to: mv.to };
+  cursor++;
+  drawBoard(); drawMoves(); drawEval();
 }
-document.getElementById('prev').onclick = ()=>{
+
+function prevMove() {
+  if (cursor <= 0) return;
+  game.undo();
+  cursor--;
+  lastMove = null;
+  drawBoard(); drawMoves(); drawEval();
+}
+
+document.getElementById("next").onclick = nextMove;
+document.getElementById("prev").onclick = prevMove;
+
+drawBoard();
+drawMoves();
+drawEval();
+</script>
+
+</body>
+</html>
+
     if(cursor > 0) cursor--;
     updateBoard();
 }
