@@ -85,7 +85,7 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
         for move in game.mainline_moves():
             info = engine.analyse(
                 board,
-                chess.engine.Limit(depth=DEPTH),
+                chess.engine.Limit(depth=DEPTH, time=3),
                 multipv=STRICTNESS
             )
 
