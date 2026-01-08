@@ -9,7 +9,7 @@ RESULT_DIR = "/tmp/results"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(RESULT_DIR, exist_ok=True)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 
 @app.route("/evaluate", methods=["POST"])
 def evaluate():
