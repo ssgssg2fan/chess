@@ -7,7 +7,10 @@ app = Flask(__name__)
 
 @app.route("/evaluate", methods=["POST"])
 def evaluate():
-    file = request.files["pgn"]
+    if "file" not in request.files:
+    return "NO FILE", 400
+
+    file = request.files["file"]
     pgn_path = os.path.join("uploads", file.filename)
     UPLOAD_DIR = "/tmp"
     path = os.path.join(UPLOAD_DIR, file.filename)
