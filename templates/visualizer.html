@@ -2,153 +2,98 @@
 <html>
 <head>
     <title>Chess Visualizer</title>
+    <link rel="stylesheet" href="https://unpkg.com/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
     <style>
-        body { 
-            font-family: monospace; 
-            margin:20px; 
-            background-color: #808080; 
-            color: #fff; 
-        }
-        #container { display:flex; }
-        #board { display:grid; grid-template-columns: repeat(8, 50px); grid-gap: 0; }
-
-        .cell { width:50px; height:50px; text-align:center; line-height:50px; font-size:20px; }
-        .white { background-color:#eee; }
-        .black { background-color:#76a86b; color:black; }
-        .highlight { background-color: yellow !important; }
-        #panel { margin-left:20px; width:300px; }
-        #moves { max-height:400px; overflow-y:auto; font-size:14px; }
-        #evalbar { width:20px; height:300px; background:#ccc; margin:10px auto; position:relative; }
-        #evalfill { width:100%; background:black; position:absolute; bottom:0; }
-        .btn { margin:5px; padding:5px 10px; background-color:black; color:white; border:none; cursor:pointer; }
+        body { background:#303030; color:white; font-family:monospace; }
+        #board { width: 480px; margin: 20px; display:inline-block; }
+        #panel { display:inline-block; vertical-align:top; margin-left:20px; }
+        #moves { max-height:400px; overflow-y:auto; font-size:16px; margin-bottom:10px; }
+        #evalbar { width:20px; height:300px; background:#eee; position:relative; margin-bottom:10px;}
+        #evalfill { width:100%; position:absolute; bottom:0; background:black; }
+        .btn { padding:5px 10px; background:black; color:white; border:none; cursor:pointer; margin:2px; }
     </style>
 </head>
 <body>
-    <h1>Chess Visualizer</h1>
-    <form action="/visualize" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" required>
-        <button type="submit">Upload & Visualize</button>
-    </form>
+<h1>Chess Visualizer</h1>
+<form action="/visualize" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <button type="submit" class="btn">Upload & Visualize</button>
+</form>
 
-    <div id="container">
-        <div id="board"></div>
-        <div id="panel">
-            <div id="evalbar"><div id="evalfill"></div></div>
-            <div id="moves"></div>
-            <button class="btn" id="prev">◀ Prev</button>
-            <button class="btn" id="next">Next ▶</button>
-            <a class="btn" id="back" href="/">← Back</a>
-        </div>
-    </div>
+<div id="board"></div>
+<div id="panel">
+    <div id="evalbar"><div id="evalfill"></div></div>
+    <div id="moves"></div>
+    <button class="btn" id="prev">◀ Prev</button>
+    <button class="btn" id="next">Next ▶</button>
+    <a class="btn" id="back" href="/">← Back</a>
+</div>
 
-    <script>
-        const moves = {{ moves|tojson }};
-        const initialFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-        const pieceSymbols = {
-            'P':'♙','N':'♘','B':'♗','R':'♖','Q':'♕','K':'♔',
-            'p':'♟','n':'♞','b':'♝','r':'♜','q':'♛','k':'♚'
-        };
-        const board = Array(8).fill(null).map(()=>Array(8).fill(''));
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.13.4/chess.min.js"></script>
+<script src="https://unpkg.com/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+<script>
+const moves = {{ moves|tojson }};
+const LABEL_COLORS = {
+    "great(star)": "green",
+    "fu**n great(!!)": "gold",
+    "far even heavy great(!)": "blue",
+    "good(daboong)": "green",
+    "missed(x)": "red",
+    "what(?)": "red",
+    "blunder(??)": "red",
+    "ordinary(..)": "gray"
+};
 
-        function setupBoard(fen){
-            const rows = fen.split('/');
-            for(let r=0;r<8;r++){
-                let f=0;
-                for(const c of rows[r]){
-                    if(!isNaN(c)){
-                        f+=parseInt(c);
-                    }else{
-                        board[7-r][f] = pieceSymbols[c];
-                        f++;
-                    }
-                }
-            }
-        }
-        setupBoard(initialFEN);
+let cursor = 0;
+let chess = new Chess();
+let board = Chessboard('board', { draggable: false, position: 'start' });
 
-        let cursor = 0;
-        let lastMove = null;
+function updateBoard(){
+    const move = moves[cursor-1];
+    if(move){
+        chess.move(move.san);
+        board.position(chess.fen());
+    } else {
+        chess.reset();
+        board.start();
+    }
+    drawMoves();
+    drawEval();
+}
 
-        function drawBoard(){
-            const boardDiv = document.getElementById('board');
-            boardDiv.innerHTML='';
-            for(let r=7;r>=0;r--){
-                for(let f=0;f<8;f++){
-                    const cell = document.createElement('div');
-                    cell.className = 'cell ' + ((r+f)%2?'white':'black');
-                    if(lastMove && (lastMove[0]==r && lastMove[1]==f || lastMove[2]==r && lastMove[3]==f)){
-                        cell.classList.add('highlight');
-                    }
-                    cell.textContent = board[r][f];
-                    boardDiv.appendChild(cell);
-                }
-            }
-        }
+function drawMoves(){
+    const movesDiv = document.getElementById('moves');
+    movesDiv.innerHTML='';
+    moves.forEach((m,i)=>{
+        const div = document.createElement('div');
+        div.textContent=`${i+1} ${m.color}. ${m.san} [${m.label}] Δ=${m.delta}`;
+        div.style.color = LABEL_COLORS[m.label] || 'white';
+        if(i===cursor-1) div.style.background='#555';
+        movesDiv.appendChild(div);
+    });
+}
 
-        function drawMoves(){
-            const movesDiv = document.getElementById('moves');
-            movesDiv.innerHTML='';
-            moves.forEach((m,i)=>{
-                const div = document.createElement('div');
-                div.textContent=`${m.turn} ${m.color}. ${m.san} [${m.label}] Δ=${m.delta}`;
-                if(i===cursor-1) div.style.background='#ccc';
-                movesDiv.appendChild(div);
-            });
-        }
+function drawEval(){
+    const bar = document.getElementById('evalfill');
+    if(cursor===0){ bar.style.height='50%'; return; }
+    const val = Math.max(-1, Math.min(1, moves[cursor-1].delta/20));
+    bar.style.height=((val+1)/2*100)+'%';
+    bar.style.backgroundColor=val>=0?'black':'white';
+}
 
-        function drawEvalBar(){
-            const bar = document.getElementById('evalfill');
-            if(cursor===0){ bar.style.height='50%'; return; }
-            const m = moves[cursor-1];
-            const val = Math.max(-1,Math.min(1,m.delta/20));
-            bar.style.height = ((val+1)/2*100) + '%';
-            bar.style.backgroundColor = val>=0?'black':'#ddd';
-        }
+document.getElementById('next').onclick = ()=>{
+    if(cursor < moves.length) cursor++;
+    updateBoard();
+}
+document.getElementById('prev').onclick = ()=>{
+    if(cursor > 0) cursor--;
+    chess.reset();
+    for(let i=0;i<cursor;i++) chess.move(moves[i].san);
+    board.position(chess.fen());
+    updateBoard();
+}
 
-        function pushMove(){
-            if(cursor>=moves.length) return;
-            const m = moves[cursor];
-            // 간단하게 SAN 첫글자 기반 임시 좌표
-            const pieceChar = m.san[0];
-            const color = m.color==='W'?pieceChar.toUpperCase():pieceChar.toLowerCase();
-            // FEN 파서 없이 간단 표시: 랜덤 위치 X,Y
-            let placed = false;
-            for(let r=0;r<8&&!placed;r++){
-                for(let f=0;f<8&&!placed;f++){
-                    if(board[r][f]===''){
-                        board[r][f]=pieceSymbols[color]||pieceSymbols['P'];
-                        lastMove=[r,f,r,f];
-                        placed = true;
-                    }
-                }
-            }
-            cursor++;
-            drawBoard(); drawMoves(); drawEvalBar();
-        }
-
-        function popMove(){
-            if(cursor<=0) return;
-            cursor--;
-            lastMove=null;
-            // 단순 초기화 후 다시 셋업
-            for(let r=0;r<8;r++){
-                for(let f=0;f<8;f++){
-                    board[r][f]='';
-                }
-            }
-            setupBoard(initialFEN);
-            for(let i=0;i<cursor;i++){
-                pushMove();
-            }
-            drawBoard(); drawMoves(); drawEvalBar();
-        }
-
-        document.getElementById('next').onclick = pushMove;
-        document.getElementById('prev').onclick = popMove;
-
-        drawBoard();
-        drawMoves();
-        drawEvalBar();
-    </script>
+updateBoard();
+</script>
 </body>
 </html>
