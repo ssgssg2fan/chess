@@ -67,6 +67,8 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
     if game is None:
         raise ValueError("PGN 로드 실패")
 
+    os.makedirs(output_dir, exist_ok=True)
+
     out_path = os.path.join(
         output_dir,
         "evaluated_" + os.path.basename(pgn_path)
