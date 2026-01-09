@@ -55,24 +55,31 @@ window.onload = () => {
     
     function drawEval() {
     const bar = document.getElementById("evalfill");
-    if(cursor === 0 || !moves[cursor-1]) {
+    if(cursor === 0){
         bar.style.height = "50%";
         bar.style.background = "black";
+        console.log("cursor=0, raw delta='0', parsed delta=0");
         return;
     }
 
-    let dStr = moves[cursor-1].delta;
-    let match = typeof dStr === "string" ? dStr.match(/\슥슥([-\d.]+)\이/) : null;
-    let d = match ? parseFloat(match[1]) : 0;
+    let dStr = moves[cursor-1].delta; // raw delta
+    let d = 0;
+
+    // 숫자만 추출: '슥슥0.32이' -> 0.32
+    if(typeof dStr === "string") {
+        const match = dStr.match(/슥슥([-\d.]+)이/);
+        d = match ? parseFloat(match[1]) : 0;
+    }
 
     console.log(`cursor=${cursor}, raw delta="${dStr}", parsed delta=${d}`);
-    
-    const maxEval = 20;
-    const normalized = (d + maxEval) / (2 * maxEval);
 
-    bar.style.height = (normalized * 100) + "%";
+    const maxEval = 100;
+    const normalized = (d + maxEval) / (2*maxEval); // 0~1
+
+    bar.style.height = (normalized*100) + "%";
     bar.style.background = d >= 0 ? "black" : "white";
 }
+
 
     function redraw() {
     drawBoard();
