@@ -62,7 +62,9 @@ window.onload = () => {
     }
 
     // delta 문자열을 숫자로 변환
-    let d = moves[cursor-1].delta;
+    let raw = moves[cursor-1].raw; // 전체 문자열
+    let m = raw.match(/Δ=([+-]?\d+(\.\d+)?)/);
+    let d = m ? parseFloat(m[1]) : 0;
     if(typeof d === "string") {
         d = parseFloat(d);  // "11.00" -> 11
     }
