@@ -86,7 +86,7 @@ def visualize():
                     "san": m.group(2),
                     "label": m.group(3),
                     "turn": int(line.split()[0]),
-                    "delta": 0
+                    "delta": m.group(5)
                 })
 
     return render_template("visualizer.html", moves=moves)
