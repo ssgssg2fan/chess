@@ -13,28 +13,24 @@ window.onload = () => {
         bb: "/static/pieces/bb.png", br: "/static/pieces/br.png",
         bq: "/static/pieces/bq.png", bk: "/static/pieces/bk.png"
     };
+    for (let r = 7; r >= 0; r--) {
+        for (let f = 0; f < 8; f++) {
+            const cell = document.createElement("div");
+            const isWhite = (r + f) % 2 === 0;
+            cell.className = "cell " + (isWhite ? "white" : "green");
 
-    function drawBoard() {
-        const boardDiv = document.getElementById("board");
-        boardDiv.innerHTML = "";
-        const pos = game.board();
+            // 좌우 반전 적용
+            const fileIndex = 7 - f;
 
-        for (let r = 7; r >= 0; r--) {
-            for (let f = 0; f < 8; f++) {
-                const cell = document.createElement("div");
-                const isWhite = (r + f) % 2 === 0;
-                cell.className = "cell " + (isWhite ? "white" : "green");
-
-                const sq = r*8+f;
-                if(lastMove && (sq === lastMove.from || sq === lastMove.to)) {
-                    cell.classList.add("highlight");
-                }
-
-                const p = pos[r][f];
-                if(p) cell.innerHTML = `<img src="${PIECE_IMAGES[p.color+p.type]}" style="width:100%;height:100%;">`;
-
-                boardDiv.appendChild(cell);
+            const sq = r*8 + fileIndex;
+            if(lastMove && (sq === lastMove.from || sq === lastMove.to)) {
+                cell.classList.add("highlight");
             }
+
+            const p = pos[r][fileIndex];
+            if(p) cell.innerHTML = `<img src="${PIECE_IMAGES[p.color+p.type]}" style="width:100%;height:100%;">`;
+
+            boardDiv.appendChild(cell);
         }
     }
 
