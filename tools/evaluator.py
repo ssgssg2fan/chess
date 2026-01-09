@@ -111,7 +111,7 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
 
             board.push(move)
             
-            eval_score = next((ev for mv, ev in scored if mv == chosen), None)
+            eval_score = safe_cp(info[0]["score"])
 
             out.write(
                 f"{prefix:<6} {san:<8} "
