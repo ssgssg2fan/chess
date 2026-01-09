@@ -69,8 +69,7 @@ window.onload = () => {
         return;
     }
 
-    const m = move.raw.match(/Δ=([+-]?\d+(\.\d+)?)/);
-    const d = m ? parseFloat(m[1]) : 0;
+    let d = moves[cursor-1].delta;
 
     const maxEval = 5.0;
     const normalized = Math.max(0, Math.min(1, (d + maxEval) / (2 * maxEval)));
