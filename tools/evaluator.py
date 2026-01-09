@@ -11,6 +11,7 @@ STRICTNESS = 6
 STRICT_DEGREE = (5 - STRICTNESS / 2) * 100
 DEPTH = 12
 MATE_SCORE = 1000
+score = info['score'].white().score()
 
 # ⚠️ 웹 서버용 Stockfish 경로
 STOCKFISH_PATH = "/usr/games/stockfish"  # 나중에 설명함
