@@ -55,7 +55,7 @@ window.onload = () => {
 
     function getDelta(move) {
         if(!move.delta) return 0;
-        const match = move.delta.match(/\{(.*?)\}/); // {} 안 숫자만 추출
+        let match = labelStr.match(/\[\[(.*?)\]\]/); // {} 안 숫자만 추출
         if(match && match[1]) return parseFloat(match[1]);
         return 0;
     }
