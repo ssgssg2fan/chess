@@ -40,13 +40,13 @@ def classify_move(board, chosen, scored):
     if chosen_eval is None:
         return "ordinary(..)", 0, 0
 
-    delta = best_eval - chosen_eval
+    delta = best_eval - eval_score
 
     if abs(delta) >= 500:
         return "blunder(??)", 3, delta
 
     if chosen == best_mv:
-        if abs(best_eval - second_eval) <= STRICT_DEGREE:
+        if abs(best_eval - second_eval) >= STRICT_DEGREE:
             return "great(star)", 0, delta
         if is_sacrifice(board, chosen):
             return "fu**n great(!!)", 0, delta
@@ -54,7 +54,8 @@ def classify_move(board, chosen, scored):
 
     if delta < STRICT_DEGREE:
         return "good(daboong)", 0, delta
-
+        
+    if 500 > delta > STRICT_DEGREE:
     return "missed(x)", 0, delta
 
 # =====================
@@ -97,10 +98,17 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
             scored.sort(key=lambda x: x[1], reverse=True)
 
             san = board.san(move)
+            board.push(move)
             label, penalty, delta = classify_move(board, move, scored)
 
             mistake_points += penalty
             move_count += 1
+
+            eval_score = engine.analyse(
+                board,
+                chess.engine.Limit(depth=DEPTH, time=3),
+                multipv=STRICTNESS
+            )
 
             if move_count % 2 == 1:
                 turn = (move_count + 1) // 2
@@ -108,10 +116,6 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
             else:
                 turn = move_count // 2
                 prefix = f"{turn} B."
-
-            board.push(move)
-            
-            eval_score = safe_cp(info[0]["score"])
 
             out.write(
                 f"{prefix:<6} {san:<8} "
