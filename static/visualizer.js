@@ -54,24 +54,25 @@ window.onload = () => {
     }
     
     function drawEval() {
-        const bar = document.getElementById("evalfill");
-        
-        let dRaw = moves[cursor-1].delta;
-        let d = 0;
-
-        if(typeof dRaw === "string") {
-            let match = dRaw.match(/슥슥\{\s*([-\d.]+)\s*\}이/);
-            if(match) d = parseFloat(match[1]);
-        } else if(typeof dRaw === "number") {
-            d = dRaw;
-        }
-
-        const maxEval = 100;
-        const normalized = (d + maxEval) / (2*maxEval);
-
-        bar.style.height = (normalized*100) + "%";
-        bar.style.background = d >= 0 ? "black" : "white";
+    const bar = document.getElementById("evalfill");
+    if(cursor === 0 || !moves[cursor-1]) {
+        bar.style.height = "50%";
+        bar.style.background = "black";
+        return;
     }
+
+    let dStr = moves[cursor-1].delta;
+    let match = typeof dStr === "string" ? dStr.match(/\{([-\d.]+)\}/) : null;
+    let d = match ? parseFloat(match[1]) : 0;
+
+    console.log(`cursor=${cursor}, raw delta="${dStr}", parsed delta=${d}`);
+    
+    const maxEval = 20;
+    const normalized = (d + maxEval) / (2 * maxEval);
+
+    bar.style.height = (normalized * 100) + "%";
+    bar.style.background = d >= 0 ? "black" : "white";
+}
 
     function redraw() {
     drawBoard();
