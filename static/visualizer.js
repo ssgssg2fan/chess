@@ -95,6 +95,7 @@ window.onload = () => {
         game.undo();
         cursor--;
         lastMove = null;
+        redraw();
     }
 
     document.getElementById("next").onclick = nextMove;
