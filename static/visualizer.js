@@ -62,24 +62,31 @@ window.onload = () => {
         return;
     }
 
-    let dStr = moves[cursor-1].delta; // raw delta
+    // moves 배열에서 현재 move 문자열 전체 확인
+    const moveObj = moves[cursor-1];
+    console.log("cursor="+cursor+", full move object:", moveObj);
+
+    // delta 문자열 가져오기
+    let dStr = moveObj.delta;  // ex: "슥슥0.32이"
+    console.log("cursor="+cursor+", raw delta='"+dStr+"'");
+
+    // 문자열 아닌 경우 처리
+    if(typeof dStr !== "string") dStr = String(dStr);
+
+    // 숫자 부분만 추출
+    const match = dStr.match(/-?\d+(\.\d+)?/);
     let d = 0;
+    if(match) d = parseFloat(match[0]);
 
-    // 숫자만 추출: '슥슥0.32이' -> 0.32
-    if(typeof dStr === "string") {
-        const match = dStr.match(/-?\d+(\.\d+)?/);
-        d = match ? parseFloat(match[1]) : 0;
-    }
+    console.log("cursor="+cursor+", parsed delta="+d);
 
-    console.log(`cursor=${cursor}, raw delta="${dStr}", parsed delta=${d}`);
-
-    const maxEval = 100;
-    const normalized = (d + maxEval) / (2*maxEval); // 0~1
+    // 평가 막대 범위 설정
+    const maxEval = 10;  // 필요하면 맞춰 조정
+    const normalized = Math.min(Math.max((d + maxEval)/(2*maxEval),0),1);
 
     bar.style.height = (normalized*100) + "%";
     bar.style.background = d >= 0 ? "black" : "white";
 }
-
 
     function redraw() {
     drawBoard();
