@@ -55,13 +55,7 @@ window.onload = () => {
     
     function drawEval() {
         const bar = document.getElementById("evalfill");
-
-        if(cursor === 0){
-            bar.style.height = "50%";
-            bar.style.background = "black";
-            return;
-        }
-
+        
         let dRaw = moves[cursor-1].delta;
         let d = 0;
 
