@@ -9,7 +9,6 @@ import chess.engine
 # =====================
 STRICTNESS = 6
 STRICT_DEGREE = (5 - STRICTNESS / 2) * 100
-DEPTH = 12
 MATE_SCORE = 10000
 
 STOCKFISH_PATH = "/usr/games/stockfish"
@@ -58,7 +57,13 @@ def classify_move(board, chosen, scored, post_eval):
 # =====================
 # 웹용 메인 함수
 # =====================
-def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
+def evaluate_pgn(
+    pgn_path: str,
+    output_dir: str,
+    depth: int = DEFAULT_DEPTH,
+    max_time: float = DEFAULT_TIME
+) -> str:
+    
     with open(pgn_path, encoding="utf-8") as f:
         game = chess.pgn.read_game(f)
 
@@ -87,7 +92,7 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
             # =====================
             pre_info = engine.analyse(
                 board,
-                chess.engine.Limit(depth=DEPTH, time=3),
+                chess.engine.Limit(depth=depth, time=max_time),
                 multipv=STRICTNESS
             )
 
@@ -108,7 +113,7 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
             # =====================
             post_info = engine.analyse(
                 board,
-                chess.engine.Limit(depth=DEPTH, time=3),
+                chess.engine.Limit(depth=depth, time=max_time),
                 multipv=1
             )
             post_eval = safe_cp(post_info[0]["score"])
