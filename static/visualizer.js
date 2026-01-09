@@ -27,7 +27,7 @@ window.onload = () => {
                 cell.classList.add("highlight");
             }
 
-            const p = pos[r][fileIndex];
+            const p = boardState[r][fileIndex];
             if(p) cell.innerHTML = `<img src="${PIECE_IMAGES[p.color+p.type]}" style="width:100%;height:100%;">`;
 
             boardDiv.appendChild(cell);
@@ -99,4 +99,3 @@ window.onload = () => {
 };
 
 
-redraw();
