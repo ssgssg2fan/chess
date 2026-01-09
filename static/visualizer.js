@@ -52,46 +52,42 @@ window.onload = () => {
             div.appendChild(line);
         }
     }
-
-    function drawEval() {
-    const bar = document.getElementById("evalfill");
-    if(cursor === 0){
-        bar.style.height = "50%";
-        bar.style.background = "black";
-        return;
-    }
-
-    var dRaw = moves[cursor-1].delta;
-    var d = 0;
-
-    if(typeof dRaw === "string") {
-        // 슥슥{숫자}이 패턴에서 숫자만 추출
-        var match = dRaw.match(/슥슥\{\s*([-\d.]+)\s*\}이/);
-        if(match) d = parseFloat(match[1]);
-    } else if(typeof dRaw === "number") {
-        d = dRaw; // 이미 숫자면 그대로
-    }
-    // 평가 막대 범위 설정, 예: -100 ~ +100 -> 0~100%
-    const maxEval = 20;  
-    const normalized = (d + maxEval) / (2*maxEval); // 0~1
-
-    bar.style.height = (normalized*100) + "%";
-    bar.style.background = d >= 0 ? "black" : "white";
-}
-
     
-    function redraw() {
-        drawBoard();
-        drawMoves();
-        drawEval();
+    function drawEval() {
+        const bar = document.getElementById("evalfill");
+
+        if(cursor === 0){
+            bar.style.height = "50%";
+            bar.style.background = "black";
+            return;
+        }
+
+        let dRaw = moves[cursor-1].delta;
+        let d = 0;
+
+        if(typeof dRaw === "string") {
+            let match = dRaw.match(/슥슥\{\s*([-\d.]+)\s*\}이/);
+            if(match) d = parseFloat(match[1]);
+        } else if(typeof dRaw === "number") {
+            d = dRaw;
+        }
+
+        const maxEval = 100;
+        const normalized = (d + maxEval) / (2*maxEval);
+
+        bar.style.height = (normalized*100) + "%";
+        bar.style.background = d >= 0 ? "black" : "white";
     }
 
+// nextMove/prevMove 통합
     function nextMove() {
         if(cursor >= moves.length) return;
         const mv = game.move(moves[cursor].san);
         lastMove = { from: mv.from, to: mv.to };
         cursor++;
-        redraw();
+        drawBoard();
+        drawMoves();
+        drawEval();
     }
 
     function prevMove() {
@@ -99,8 +95,11 @@ window.onload = () => {
         game.undo();
         cursor--;
         lastMove = null;
-        redraw();
+        drawBoard();
+        drawMoves();
+        drawEval();
     }
+
 
     document.getElementById("next").onclick = nextMove;
     document.getElementById("prev").onclick = prevMove;
