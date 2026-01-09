@@ -108,15 +108,16 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
             else:
                 turn = move_count // 2
                 prefix = f"{turn} B."
-                
-            eval_score = chosen_eval
+
+            board.push(move)
+            
+            eval_score = next((ev for mv, ev in scored if mv == chosen), None)
 
             out.write(
                 f"{prefix:<6} {san:<8} "
                 f"[{label}]  Δ={eval_score/100:.2f}\n"
             )
 
-            board.push(move)
             time.sleep(0.1)
 
         final_accuracy = max(0.0, (1 - mistake_points / move_count) * 100)
