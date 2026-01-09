@@ -1,7 +1,9 @@
 window.onload = () => {
     const game = new Chess();
     const moves = window.MOVES;
-
+    const boardDiv = document.getElementById("board"); // ✅ 여기 선언
+    boardDiv.innerHTML = "";
+    
     let cursor = 0;
     let lastMove = null;
 
@@ -99,4 +101,4 @@ window.onload = () => {
 };
 
 
-redraw();
+
