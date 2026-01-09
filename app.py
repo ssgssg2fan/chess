@@ -24,6 +24,9 @@ def evaluate():
     UPLOAD_DIR = "/tmp"
     os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+    depth = int(request.form.get("depth", 12))
+    max_time = float(request.form.get("max_time", 3.0))
+
     pgn_path = os.path.join(UPLOAD_DIR, file.filename)
     file.save(pgn_path)
 
