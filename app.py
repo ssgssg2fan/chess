@@ -33,7 +33,7 @@ def evaluate():
     RESULT_DIR = "/tmp/results"
     os.makedirs(RESULT_DIR, exist_ok=True)
 
-    result_path = evaluate_pgn(pgn_path, RESULT_DIR)
+    result_path = evaluate_pgn(pgn_path, RESULT_DIR, depth=depth, max_time=max_time)
     return send_file(result_path, as_attachment=True)
 
     log_path = os.path.join(UPLOAD_DIR, file.filename)
