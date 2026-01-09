@@ -72,7 +72,7 @@ window.onload = () => {
         d = dRaw; // 이미 숫자면 그대로
     }
     // 평가 막대 범위 설정, 예: -100 ~ +100 -> 0~100%
-    const maxEval = 100;  
+    const maxEval = 20;  
     const normalized = (d + maxEval) / (2*maxEval); // 0~1
 
     bar.style.height = (normalized*100) + "%";
