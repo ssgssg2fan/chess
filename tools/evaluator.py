@@ -12,8 +12,7 @@ STRICT_DEGREE = (5 - STRICTNESS / 2) * 100
 DEPTH = 12
 MATE_SCORE = 10000
 
-# ⚠️ 웹 서버용 Stockfish 경로
-STOCKFISH_PATH = "/usr/games/stockfish"  # 나중에 설명함
+STOCKFISH_PATH = "/usr/games/stockfish"
 
 # =====================
 # 유틸
@@ -32,15 +31,11 @@ def is_sacrifice(board, move):
         return False
     return mover.piece_type > captured.piece_type
 
-def classify_move(board, chosen, scored):
+def classify_move(board, chosen, scored, post_eval):
     best_mv, best_eval = scored[0]
     second_eval = scored[1][1] if len(scored) > 1 else best_eval
 
-    chosen_eval = next((ev for mv, ev in scored if mv == chosen), None)
-    if chosen_eval is None:
-        return "ordinary(..)", 0, 0
-
-    delta = best_eval - eval_score
+    delta = best_eval - post_eval
 
     if abs(delta) >= 500:
         return "blunder(??)", 3, delta
@@ -54,9 +49,11 @@ def classify_move(board, chosen, scored):
 
     if delta < STRICT_DEGREE:
         return "good(daboong)", 0, delta
-        
+
     if 500 > delta > STRICT_DEGREE:
-    return "missed(x)", 0, delta
+        return "missed(x)", 0, delta
+
+    return "ordinary(..)", 0, delta
 
 # =====================
 # 웹용 메인 함수
@@ -84,31 +81,45 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
 
     with open(out_path, "w", encoding="utf-8") as out:
         for move in game.mainline_moves():
-            info = engine.analyse(
+
+            # =====================
+            # 1. 수 두기 전 평가
+            # =====================
+            pre_info = engine.analyse(
                 board,
                 chess.engine.Limit(depth=DEPTH, time=3),
                 multipv=STRICTNESS
             )
 
             scored = []
-            for pv in info:
+            for pv in pre_info:
                 if "pv" in pv and pv["pv"]:
                     scored.append((pv["pv"][0], safe_cp(pv["score"])))
-
             scored.sort(key=lambda x: x[1], reverse=True)
 
+            # =====================
+            # 2. 수 두기
+            # =====================
             san = board.san(move)
             board.push(move)
-            label, penalty, delta = classify_move(board, move, scored)
+
+            # =====================
+            # 3. 수 둔 후 평가
+            # =====================
+            post_info = engine.analyse(
+                board,
+                chess.engine.Limit(depth=DEPTH, time=3),
+                multipv=1
+            )
+            post_eval = safe_cp(post_info[0]["score"])
+
+            # =====================
+            # 4. 분류
+            # =====================
+            label, penalty, delta = classify_move(board, move, scored, post_eval)
 
             mistake_points += penalty
             move_count += 1
-
-            eval_score = engine.analyse(
-                board,
-                chess.engine.Limit(depth=DEPTH, time=3),
-                multipv=STRICTNESS
-            )
 
             if move_count % 2 == 1:
                 turn = (move_count + 1) // 2
@@ -117,9 +128,12 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
                 turn = move_count // 2
                 prefix = f"{turn} B."
 
+            # =====================
+            # 5. 기록 / 출력
+            # =====================
             out.write(
                 f"{prefix:<6} {san:<8} "
-                f"[{label}]  Δ={eval_score/100:.2f}\n"
+                f"[{label}]  Δ={post_eval/100:.2f}\n"
             )
 
             time.sleep(0.1)
