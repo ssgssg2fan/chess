@@ -8,22 +8,6 @@ const game = new Chess();
 console.log("Chess =", typeof Chess);
 const moves = window.MOVES;
 
-<div id="tag"></div>
-
-function drawTag() {
-    const tagDiv = document.getElementById("tag");
-    tagDiv.textContent = cursor>0 ? moves[cursor-1].label : "";
-}
-function redraw(){
-    drawBoard(); drawMoves(); drawEval(); drawTag();
-}
-
-<button id="flip">Flip Board</button>
-
-document.getElementById("flip").onclick = ()=>{
-  document.getElementById("board").classList.toggle("flipped");
-}
-
 let cursor = 0;
 let lastMove = null;
 
