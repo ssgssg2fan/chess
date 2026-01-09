@@ -52,7 +52,7 @@ def evaluate():
                     "color": m.group(1),
                     "san": m.group(2),
                     "label": m.group(3),
-                    "delta": 0
+                    "delta": float(m.group(5))
                 })
 
     # moves를 HTML에 전달
