@@ -63,7 +63,7 @@ window.onload = () => {
 
     // delta 문자열 가져오기
     let dStr = moves[cursor-1].delta;  // "슥슥0.32슥슥" 같은 형식
-    let const = dStr.match(/슥슥([-+]?\d*\.?\d+)이/); 
+    const match = dStr.match(/슥슥([-+]?\d*\.?\d+)이/); 
     let d = match ? parseFloat(match[1]) : 0;
 
     // 평가 막대 범위 설정, 예: -100 ~ +100 -> 0~100%
