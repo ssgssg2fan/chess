@@ -140,7 +140,7 @@ def evaluate_pgn(
             # =====================
             out.write(
                 f"{prefix:<6} {san:<8} "
-                f"[{label}]  Δ={{post_eval/100:.2f}\n}"
+                f"[{label}]  Δ=[[{post_eval/100:.2f}\n]]"
             )
 
             time.sleep(0.1)
