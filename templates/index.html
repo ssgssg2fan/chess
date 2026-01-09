@@ -1,28 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Main</title>
 </head>
 <body>
+
     <h1>Main Page</h1>
 
-    <button onclick="location.href='/chess'">
-        Chess Tool
-    </button>
-<body>
-    <h1>Main Page</h1>
-
+    <!-- Chess Tool 이동 -->
     <button onclick="location.href='/chess'">
         Chess Tool
     </button>
 
+    <hr>
+
+    <!-- PGN 평가 -->
+    <h2>Evaluate PGN</h2>
     <form action="/evaluate" method="post" enctype="multipart/form-data">
         <input type="file" name="file" required>
+        <br><br>
+
+        <!-- 유저 설정 -->
+        <label>Depth: <span id="depthVal">12</span></label><br>
+        <input type="range" name="depth" min="1" max="25" value="12"
+               oninput="depthVal.innerText=this.value">
+
+        <br><br>
+
+        <label>Max Time (seconds)</label><br>
+        <input type="number" name="max_time" value="3" step="0.1" min="0.1">
+
+        <br><br>
         <button type="submit">Evaluate</button>
     </form>
-</body>
 
-<form action="/visualize" method="post" enctype="multipart/form-data">
-  <input type="file" name="file" required>
-  <button type="submit">Show Moves</button>
-</form>
+    <hr>
+
+    <!-- PGN 시각화 -->
+    <h2>Visualize Moves</h2>
+    <form action="/visualize" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <br><br>
+        <button type="submit">Show Moves</button>
+    </form>
+
+</body>
+</html>
