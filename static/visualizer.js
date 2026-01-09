@@ -2,7 +2,6 @@ window.onload = () => {
     const game = new Chess();
     const moves = window.MOVES;
     const boardDiv = document.getElementById("board"); // ✅ 여기 선언
-    boardDiv.innerHTML = "";
     
     let cursor = 0;
     let lastMove = null;
@@ -17,27 +16,28 @@ window.onload = () => {
     };
     
     function drawBoard() {
-    for (let r = 7; r >= 0; r--) {
-        for (let f = 0; f < 8; f++) {
-            const cell = document.createElement("div");
-            const isWhite = (r + f) % 2 === 0;
-            cell.className = "cell " + (isWhite ? "white" : "green");
+            boardDiv.innerHTML = "";
+        for (let r = 7; r >= 0; r--) {
+            for (let f = 0; f < 8; f++) {
+                const cell = document.createElement("div");
+                const isWhite = (r + f) % 2 === 0;
+                cell.className = "cell " + (isWhite ? "white" : "green");
 
-            // 좌우 반전 적용
-            const fileIndex = 7 - f;
+                // 좌우 반전 적용
+                const fileIndex = 7 - f;
 
-            const sq = r*8 + fileIndex;
-            if(lastMove && (sq === lastMove.from || sq === lastMove.to)) {
-                cell.classList.add("highlight");
-            }
+                const sq = r*8 + fileIndex;
+                if(lastMove && (sq === lastMove.from || sq === lastMove.to)) {
+                    cell.classList.add("highlight");
+                }
             
-            const boardState = game.board(); // 8x8 배열
-            const p = boardState[r][fileIndex]; 
-            if(p) cell.innerHTML = `<img src="${PIECE_IMAGES[p.color+p.type]}" style="width:100%;height:100%;">`;
+                const boardState = game.board(); // 8x8 배열
+                const p = boardState[r][fileIndex]; 
+                if(p) cell.innerHTML = `<img src="${PIECE_IMAGES[p.color+p.type]}" style="width:100%;height:100%;">`;
 
-            boardDiv.appendChild(cell);
+                boardDiv.appendChild(cell);
+            }
         }
-    }
     }
     
     function drawMoves() {
