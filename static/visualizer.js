@@ -53,31 +53,29 @@ window.onload = () => {
         }
     }
 
-   function drawEval() {
-    const bar = document.getElementById("evalfill");
-
-    if (cursor === 0) {
-        bar.style.height = "50%";
-        bar.style.background = "black";
-        return;
+    function getDelta(move) {
+        if(!move.delta) return 0;
+        const match = move.delta.match(/\{(.*?)\}/); // {} 안 숫자만 추출
+        if(match && match[1]) return parseFloat(match[1]);
+        return 0;
     }
 
-    const move = moves[cursor - 1];
-    if (!move || !move.raw) {
-        bar.style.height = "50%";
-        bar.style.background = "black";
-        return;
+    function drawEval() {
+        const bar = document.getElementById("evalfill");
+        if(cursor === 0){
+            bar.style.height = "50%";
+            bar.style.background = "black";
+            return;
+        }
+
+        let d = getDelta(moves[cursor-1]);
+        const maxEval = 100;
+        const normalized = (d + maxEval) / (2*maxEval);
+
+        bar.style.height = (normalized*100) + "%";
+        bar.style.background = d >= 0 ? "black" : "white";
     }
-
-    let d = moves[cursor-1].delta;
-
-    const maxEval = 5.0;
-    const normalized = Math.max(0, Math.min(1, (d + maxEval) / (2 * maxEval)));
-
-    bar.style.height = (normalized * 100) + "%";
-    bar.style.background = d >= 0 ? "black" : "white";
-    }
-
+    
     function redraw() {
         drawBoard();
         drawMoves();
