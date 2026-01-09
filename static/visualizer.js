@@ -27,7 +27,6 @@ window.onload = () => {
                 cell.classList.add("highlight");
             }
 
-            if(p) cell.innerHTML = `<img src="${PIECE_IMAGES[p.color+p.type]}" style="width:100%;height:100%;">`;
 
             boardDiv.appendChild(cell);
         }
