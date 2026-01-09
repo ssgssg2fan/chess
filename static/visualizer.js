@@ -55,28 +55,29 @@ window.onload = () => {
 
    function drawEval() {
     const bar = document.getElementById("evalfill");
-    if(cursor === 0){
+
+    if (cursor === 0) {
         bar.style.height = "50%";
         bar.style.background = "black";
         return;
     }
 
-    // delta 문자열을 숫자로 변환
-    let raw = moves[cursor-1].raw; // 전체 문자열
-    let m = raw.match(/Δ=([+-]?\d+(\.\d+)?)/);
-    let d = m ? parseFloat(m[1]) : 0;
-    if(typeof d === "string") {
-        d = parseFloat(d);  // "11.00" -> 11
+    const move = moves[cursor - 1];
+    if (!move || !move.raw) {
+        bar.style.height = "50%";
+        bar.style.background = "black";
+        return;
     }
 
-    // 평가 막대 범위 설정, 예: -100 ~ +100 -> 0~100%
-    const maxEval = 100;  // 데이터 기준으로 조정 가능
-    const normalized = (d*10 + maxEval) / (2*maxEval); // 0~1
+    const m = move.raw.match(/Δ=([+-]?\d+(\.\d+)?)/);
+    const d = m ? parseFloat(m[1]) : 0;
 
-    bar.style.height = (normalized*100) + "%";
+    const maxEval = 5.0;
+    const normalized = Math.max(0, Math.min(1, (d + maxEval) / (2 * maxEval)));
+
+    bar.style.height = (normalized * 100) + "%";
     bar.style.background = d >= 0 ? "black" : "white";
     }
-
 
     function redraw() {
         drawBoard();
