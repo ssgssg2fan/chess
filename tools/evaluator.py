@@ -11,12 +11,6 @@ STRICTNESS = 6
 STRICT_DEGREE = (5 - STRICTNESS / 2) * 100
 DEPTH = 12
 MATE_SCORE = 1000
-info = engine.analyse(
-board,
-chess.engine.Limit(depth=DEPTH, time=3),
-multipv=STRICTNESS
-)
-score = info['score'].white().score()
 
 # ⚠️ 웹 서버용 Stockfish 경로
 STOCKFISH_PATH = "/usr/games/stockfish"  # 나중에 설명함
@@ -89,6 +83,12 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
 
     with open(out_path, "w", encoding="utf-8") as out:
         for move in game.mainline_moves():
+            
+  info = engine.analyse(
+                board,
+                chess.engine.Limit(depth=DEPTH, time=3),
+                multipv=STRICTNESS
+            )
 
             scored = []
             for pv in info:
@@ -109,6 +109,8 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
             else:
                 turn = move_count // 2
                 prefix = f"{turn} B."
+
+score = info['score'].white().score()
 
             out.write(
                 f"{prefix:<6} {san:<8} "
