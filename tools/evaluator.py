@@ -10,7 +10,8 @@ import chess.engine
 STRICTNESS = 6
 STRICT_DEGREE = (5 - STRICTNESS / 2) * 100
 MATE_SCORE = 10000
-
+DEFAULT_DEPTH = 12
+DEFAULT_TIME = 3.0
 STOCKFISH_PATH = "/usr/games/stockfish"
 
 # =====================
