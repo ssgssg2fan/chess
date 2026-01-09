@@ -67,7 +67,7 @@ window.onload = () => {
 
     // 숫자만 추출: '슥슥0.32이' -> 0.32
     if(typeof dStr === "string") {
-        const match = dStr.match(/슥슥([-\d.]+)이/);
+        const match = dStr.match(/-?\d+(\.\d+)?/);
         d = match ? parseFloat(match[1]) : 0;
     }
 
