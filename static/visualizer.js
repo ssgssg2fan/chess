@@ -1,3 +1,9 @@
+window.onload = () => {
+    document.getElementById("next").onclick = nextMove;
+    document.getElementById("prev").onclick = prevMove;
+    redraw();
+};
+
 const game = new Chess();
 console.log("Chess =", typeof Chess);
 const moves = window.MOVES;
