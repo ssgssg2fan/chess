@@ -53,35 +53,27 @@ window.onload = () => {
         }
     }
 
-    function getDelta(move) {
-    // move.delta 예: "[[0.32]]" 또는 "[[4.24]]"
-    if (!move.delta) return 0;
-
-    const match = move.delta.match(/슥슥([-+]?\d*\.?\d+)이/); // [[숫자]] 패턴
-    if (match && match[1]) {
-        return parseFloat(match[1]);
-    }
-    return 0;
-}
-
-// 예시: drawEval에서 사용
-function drawEval() {
+    function drawEval() {
     const bar = document.getElementById("evalfill");
-    if (cursor === 0) {
+    if(cursor === 0){
         bar.style.height = "50%";
         bar.style.background = "black";
         return;
     }
 
-    let d = getDelta(moves[cursor - 1]);
+    // delta 문자열 가져오기
+    let dStr = moves[cursor-1].delta;  // "슥슥0.32슥슥" 같은 형식
+    let match = dStr.match(/슥슥([-+]?\d*\.?\d+)슥슥/); 
+    let d = match ? parseFloat(match[1]) : 0;
 
-    // 평가 막대 범위 설정: -100~+100 -> 0~100%
-    const maxEval = 100;
-    const normalized = (d + maxEval) / (2 * maxEval);
+    // 평가 막대 범위 설정, 예: -100 ~ +100 -> 0~100%
+    const maxEval = 100;  
+    const normalized = (d + maxEval) / (2*maxEval); // 0~1
 
-    bar.style.height = (normalized * 100) + "%";
+    bar.style.height = (normalized*100) + "%";
     bar.style.background = d >= 0 ? "black" : "white";
 }
+
     
     function redraw() {
         drawBoard();
