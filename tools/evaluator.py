@@ -58,7 +58,13 @@ def classify_move(board, chosen, scored, post_eval):
 # =====================
 # 웹용 메인 함수
 # =====================
-def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
+def evaluate_pgn(
+    pgn_path: str,
+    output_dir: str,
+    depth: int = 12,
+    max_time: float = 3.0
+) -> str:
+
     
     with open(pgn_path, encoding="utf-8") as f:
         game = chess.pgn.read_game(f)
