@@ -51,13 +51,28 @@ window.onload = () => {
         }
     }
 
-    function drawEval() {
-        const bar = document.getElementById("evalfill");
-        if(cursor===0){ bar.style.height="50%"; bar.style.background="black"; return; }
-        const d = Math.max(-10, Math.min(10, moves[cursor-1].delta));
-        bar.style.height = ((d+10)/20*100) + "%";
-        bar.style.background = d>=0 ? "black" : "white";
+   function drawEval() {
+    const bar = document.getElementById("evalfill");
+    if(cursor === 0){
+        bar.style.height = "50%";
+        bar.style.background = "black";
+        return;
     }
+
+    // delta 문자열을 숫자로 변환
+    let d = moves[cursor-1].delta;
+    if(typeof d === "string") {
+        d = parseFloat(d);  // "11.00" -> 11
+    }
+
+    // 평가 막대 범위 설정, 예: -100 ~ +100 -> 0~100%
+    const maxEval = 100;  // 데이터 기준으로 조정 가능
+    const normalized = (d + maxEval) / (2*maxEval); // 0~1
+
+    bar.style.height = (normalized*100) + "%";
+    bar.style.background = d >= 0 ? "black" : "white";
+    }
+
 
     function redraw() {
         drawBoard();
