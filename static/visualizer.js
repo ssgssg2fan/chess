@@ -79,6 +79,12 @@ window.onload = () => {
         bar.style.background = d >= 0 ? "black" : "white";
     }
 
+    function redraw() {
+    drawBoard();
+    drawMoves();
+    drawEval();
+    }
+    
 // nextMove/prevMove 통합
     function nextMove() {
         if(cursor >= moves.length) return;
