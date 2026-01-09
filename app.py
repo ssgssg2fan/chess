@@ -55,10 +55,16 @@ def evaluate():
     # moves를 HTML에 전달
     return render_template("visualizer.html", moves=moves)
     
-@app.route("/visualize", methods=["POST"])
+@app.route("/visualize", methods=["GET", "POST"])
 def visualize():
+    if request.method == "GET":
+        # GET이면 그냥 메인으로 보내
+        return redirect("/")
+
+    # POST 처리
     if "file" not in request.files:
         return "NO FILE", 400
+
     file = request.files["file"]
     if file.filename == "":
         return "EMPTY FILE", 400
@@ -81,7 +87,6 @@ def visualize():
                 })
 
     return render_template("visualizer.html", moves=moves)
-
 
 @app.route("/")
 def index():
