@@ -21,7 +21,7 @@ window.onload = () => {
             for (let f = 0; f < 8; f++) {
                 const cell = document.createElement("div");
                 const isWhite = (r + f) % 2 === 0;
-                cell.className = "cell " + (isWhite ? "white" : "green");
+                cell.className = "cell " + (isWhite ? "green" : "white");
 
                 // 좌우 반전 적용
                 const fileIndex = 7 - f;
