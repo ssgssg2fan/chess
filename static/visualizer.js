@@ -53,28 +53,36 @@ window.onload = () => {
         }
     }
 
-    function getDelta(move) {
-        if(!move.delta) return 0;
-        let match = labelStr.match(/\[\[(.*?)\]\]/); // {} 안 숫자만 추출
-        if(match && match[1]) return parseFloat(match[1]);
-        return 0;
-    }
-
     function drawEval() {
-        const bar = document.getElementById("evalfill");
-        if(cursor === 0){
-            bar.style.height = "50%";
-            bar.style.background = "black";
-            return;
-        }
-
-        let d = getDelta(moves[cursor-1]);
-        const maxEval = 100;
-        const normalized = (d + maxEval) / (2*maxEval);
-
-        bar.style.height = (normalized*100) + "%";
-        bar.style.background = d >= 0 ? "black" : "white";
+    const bar = document.getElementById("evalfill");
+    if (cursor === 0) {
+        bar.style.height = "50%";
+        bar.style.background = "black";
+        return;
     }
+
+    // moves[cursor-1].delta에서 [[...]] 안쪽 숫자만 추출
+    let rawDelta = moves[cursor-1].delta;
+    let d = 0;
+
+    if (typeof rawDelta === "string") {
+        const match = rawDelta.match(/\[\[(.*?)\]\]/); // [[숫자]] 안쪽
+        if (match) {
+            d = parseFloat(match[1]);
+        } else {
+            d = parseFloat(rawDelta);
+        }
+    } else {
+        d = rawDelta; // 이미 숫자이면 그대로
+    }
+
+    // 평가 막대 범위: 예 -100 ~ 100
+    const maxEval = 100;
+    const normalized = (d + maxEval) / (2 * maxEval);
+
+    bar.style.height = (normalized * 100) + "%";
+    bar.style.background = d >= 0 ? "black" : "white";
+}
     
     function redraw() {
         drawBoard();
