@@ -57,7 +57,7 @@ window.onload = () => {
     // move.delta 예: "[[0.32]]" 또는 "[[4.24]]"
     if (!move.delta) return 0;
 
-    const match = move.delta.match(/<<(-?\d+(\.\d+)?)>>/); // [[숫자]] 패턴
+    const match = move.delta.match(/슥슥([-+]?\d*\.?\d+)이/); // [[숫자]] 패턴
     if (match && match[1]) {
         return parseFloat(match[1]);
     }
