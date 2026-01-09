@@ -10,7 +10,7 @@ import chess.engine
 STRICTNESS = 6
 STRICT_DEGREE = (5 - STRICTNESS / 2) * 100
 DEPTH = 12
-MATE_SCORE = 10000
+MATE_SCORE = 1000
 
 # ⚠️ 웹 서버용 Stockfish 경로
 STOCKFISH_PATH = "/usr/games/stockfish"  # 나중에 설명함
@@ -111,7 +111,7 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
 
             out.write(
                 f"{prefix:<6} {san:<8} "
-                f"[{label}]  Δ={delta:.2f}\n"
+                f"[{label}]  Δ={score/100:.2f}\n"
             )
 
             board.push(move)
