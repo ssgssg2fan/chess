@@ -66,7 +66,6 @@ window.onload = () => {
 
 
     function redraw() {
-        drawBoard();
         drawMoves();
         drawEval();
     }
@@ -84,7 +83,6 @@ window.onload = () => {
         game.undo();
         cursor--;
         lastMove = null;
-        redraw();
     }
 
     document.getElementById("next").onclick = nextMove;
