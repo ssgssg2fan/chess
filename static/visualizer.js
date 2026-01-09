@@ -15,6 +15,8 @@ window.onload = () => {
         bb: "/static/pieces/bb.png", br: "/static/pieces/br.png",
         bq: "/static/pieces/bq.png", bk: "/static/pieces/bk.png"
     };
+    
+    function drawBoard() {
     for (let r = 7; r >= 0; r--) {
         for (let f = 0; f < 8; f++) {
             const cell = document.createElement("div");
@@ -36,7 +38,8 @@ window.onload = () => {
             boardDiv.appendChild(cell);
         }
     }
-
+    }
+    
     function drawMoves() {
         const div = document.getElementById("moves");
         div.innerHTML = "";
