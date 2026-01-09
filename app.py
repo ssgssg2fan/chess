@@ -76,7 +76,7 @@ def visualize():
     file.save(log_path)
 
     moves = []
-    pattern = re.compile(r"\d+\s+(W|B)\.\s+(\S+)\s+\[(.*?)\]")
+    pattern = re.compile(r"\d+\s+(W|B)\.\s+(\S+)\s+\[(.*?)\]\s+Δ=슥슥([-+]?\d*\.?\d+)이")
     with open(log_path, encoding="utf-8") as f:
         for line in f:
             m = pattern.search(line)
@@ -86,7 +86,7 @@ def visualize():
                     "san": m.group(2),
                     "label": m.group(3),
                     "turn": int(line.split()[0]),
-                    "delta": m.group(5)
+                    "delta": float(m.group(4))
                 })
 
     return render_template("visualizer.html", moves=moves)
