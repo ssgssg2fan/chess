@@ -61,11 +61,16 @@ window.onload = () => {
         return;
     }
 
-    // delta 문자열 가져오기
-    let dStr = moves[cursor-1].delta;  // "슥슥0.32슥슥" 같은 형식
-    const match = dStr.match(/슥슥([-+]?\d*\.?\d+)이/); 
-    let d = match ? parseFloat(match[1]) : 0;
+    var dRaw = moves[cursor-1].delta;
+    var d = 0;
 
+    if(typeof dRaw === "string") {
+        // 슥슥{숫자}이 패턴에서 숫자만 추출
+        var match = dRaw.match(/슥슥\{\s*([-\d.]+)\s*\}이/);
+        if(match) d = parseFloat(match[1]);
+    } else if(typeof dRaw === "number") {
+        d = dRaw; // 이미 숫자면 그대로
+    }
     // 평가 막대 범위 설정, 예: -100 ~ +100 -> 0~100%
     const maxEval = 100;  
     const normalized = (d + maxEval) / (2*maxEval); // 0~1
