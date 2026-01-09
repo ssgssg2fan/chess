@@ -111,7 +111,7 @@ def evaluate_pgn(pgn_path: str, output_dir: str) -> str:
 
             out.write(
                 f"{prefix:<6} {san:<8} "
-                f"[{label}]  Δ={info:.2f}\n"
+                f"[{label}]  Δ={delta:.2f}\n"
             )
 
             board.push(move)
