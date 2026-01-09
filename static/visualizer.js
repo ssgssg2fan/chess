@@ -62,7 +62,7 @@ window.onload = () => {
     }
 
     let dStr = moves[cursor-1].delta;
-    let match = typeof dStr === "string" ? dStr.match(/\{([-\d.]+)\}/) : null;
+    let match = typeof dStr === "string" ? dStr.match(/\슥슥([-\d.]+)\이/) : null;
     let d = match ? parseFloat(match[1]) : 0;
 
     console.log(`cursor=${cursor}, raw delta="${dStr}", parsed delta=${d}`);
