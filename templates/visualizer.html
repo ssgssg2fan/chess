@@ -126,8 +126,6 @@ function drawBoard() {
   const board = document.getElementById("board");
   board.innerHTML = "";
 
-  const pos = game.board(); // 8x8
-
   for (let r = 7; r >= 0; r--) {
     for (let f = 0; f < 8; f++) {
       const cell = document.createElement("div");
@@ -178,7 +176,6 @@ function drawEval() {
 function redraw() {
   drawBoard();
   drawMoves();
-  drawEval();
 }
 
 document.getElementById("next").onclick = () => {
@@ -201,5 +198,4 @@ document.getElementById("prev").onclick = () => {
 redraw();
 </script>
 
-</body>
 </html>
