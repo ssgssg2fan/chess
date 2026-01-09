@@ -53,9 +53,7 @@ window.onload = () => {
         }
     }
 
-   function drawEval(
-       console.log(cursor, moves[cursor-1]?.delta);
-   ) {
+   function drawEval() {
     const bar = document.getElementById("evalfill");
     if(cursor === 0){
         bar.style.height = "50%";
