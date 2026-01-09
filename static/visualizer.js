@@ -26,9 +26,6 @@ window.onload = () => {
             if(lastMove && (sq === lastMove.from || sq === lastMove.to)) {
                 cell.classList.add("highlight");
             }
-
-
-            boardDiv.appendChild(cell);
         }
     }
 
