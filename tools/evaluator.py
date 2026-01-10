@@ -31,36 +31,6 @@ def is_sacrifice(board, move):
         return False
     return mover.piece_type > captured.piece_type
 
-def classify_move(board, chosen, scored, post_eval):
-    best_mv, best_eval = scored[0]
-    second_eval = scored[1][1] if len(scored) > 1 else best_eval
-
-    delta = best_eval - post_eval
-
-    if abs(delta) >= 500:
-        return "블런더(??)", 3, delta
-
-    if chosen == best_mv:
-        if abs( pre_info - second_eval ) >= 150:
-            if is_sacrifice(board, chosen):
-                return "탁월(!!)", 0, delta
-            return "훌륭(!)", 0, delta
-        return "최고(★)", 0, delta
-        
-    if not chosen == best_mv:
-        if abs( pre_info - second_eval ) >= 150:
-            return "놓친 수(x)", 0, delta
-        if abs( pre_info - post_info ) <= 20:
-            return "우수한 수(👍)", 0, delta
-        return
-        
-    if abs( pre_info - post_info ) <= 100:
-        return "부정확한 수(?!)", 0, delta
-    if abs( pre_info - post_info ) < 500:
-        return "실수(?)", 0, delta
-        
-    return "ordinary(..)", 0, delta
-
 # =====================
 # 웹용 메인 함수
 # =====================
@@ -126,6 +96,36 @@ def evaluate_pgn(
             )
             post_eval = safe_cp(post_info[0]["score"])
 
+def classify_move(board, chosen, scored, post_eval):
+    best_mv, best_eval = scored[0]
+    second_eval = scored[1][1] if len(scored) > 1 else best_eval
+
+    delta = best_eval - post_eval
+
+    if abs(delta) >= 500:
+        return "블런더(??)", 3, delta
+
+    if chosen == best_mv:
+        if abs( best_eval - second_eval ) >= 150:
+            if is_sacrifice(board, chosen):
+                return "탁월(!!)", 0, delta
+            return "훌륭(!)", 0, delta
+        return "최고(★)", 0, delta
+        
+    if not chosen == best_mv:
+        if abs( best_eval - second_eval ) >= 150:
+            return "놓친 수(x)", 0, delta
+        if abs( best_eval - post_info ) <= 20:
+            return "우수한 수(👍)", 0, delta
+        return
+        
+    if abs( best_eval - post_info ) <= 100:
+        return "부정확한 수(?!)", 0, delta
+    if abs( best_eval - post_info ) < 500:
+        return "실수(?)", 0, delta
+        
+    return "ordinary(..)", 0, delta
+    
             # =====================
             # 4. 분류
             # =====================
