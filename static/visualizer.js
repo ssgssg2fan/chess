@@ -57,7 +57,7 @@ window.onload = () => {
     const bar = document.getElementById("evalfill");
     if(cursor === 0){
         bar.style.height = "50%";
-        bar.style.background = "black";
+        bar.style.background = "white";
         console.log("cursor=0, raw delta='0', parsed delta=0");
         return;
     }
@@ -90,7 +90,7 @@ window.onload = () => {
     normalized = Math.max(0, Math.min(1, normalized));
 
     bar.style.height = (normalized*100) + "%";
-    bar.style.background = d >= 0 ? "black" : "white";
+    bar.style.background = d >= 0 ? "white" : "black" ;
 
     console.log(`cursor=${cursor}, delta=${d}, normalized=${normalized}`);
 }
