@@ -4,6 +4,7 @@ window.onload = () => {
     const moves = window.MOVES;
     const boardDiv = document.getElementById("board"); // ✅ 여기 선언
     let tags = [];
+    let cur = 0;
     let cursor = 0;
     let lastMove = null;
 
@@ -96,9 +97,9 @@ window.onload = () => {
     console.log(`cursor=${cursor}, delta=${d}, normalized=${normalized}`);
 }
     function drawTag() {
-    const box = document.getElementById("tag-box");
-    if (!box) return;
-    box.textContent = tags[cur] || "";
+  const box = document.getElementById("tag-box");
+  if (!box) return;
+  box.textContent = tags[cur] || "";
 }
 
     function redraw() {
