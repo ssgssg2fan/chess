@@ -32,6 +32,9 @@ def is_sacrifice(board, move):
     return mover.piece_type > captured.piece_type
 
 def classify_move(board, chosen, scored, post_eval):
+    label = "ordinary(..)"
+    penalty = 0
+    delta = 0
     best_mv, best_eval = scored[0]
     second_eval = scored[1][1] if len(scored) > 1 else best_eval
 
@@ -52,7 +55,6 @@ def classify_move(board, chosen, scored, post_eval):
             return "놓친 수(x)", 0, delta
         if abs(best_eval - post_eval) <= 20:
             return "우수한 수(👍)", 0, delta
-        return
         
     if abs(best_eval - post_eval) <= 100:
         return "부정확한 수(?!)", 0, delta
@@ -60,7 +62,8 @@ def classify_move(board, chosen, scored, post_eval):
         return "실수(?)", 0, delta
         
     return "ordinary(..)", 0, delta
-
+    
+    return label, penalty, delta
 # =====================
 # 웹용 메인 함수
 # =====================
