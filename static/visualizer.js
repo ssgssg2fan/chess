@@ -97,16 +97,10 @@ window.onload = () => {
     console.log(`cursor=${cursor}, delta=${d}, normalized=${normalized}`);
 }
     function drawTag() {
-    if (cursor === 0) {
-        console.log("[label] start position");
-        return;
+    if (cursor === 0) return;
+    console.log(moves[cursor - 1].label);
     }
 
-    const move = moves[cursor - 1];
-    const tagText = move.label || "";
-
-    console.log("[label]", tagText);
-}
 
     function redraw() {
     drawBoard();
