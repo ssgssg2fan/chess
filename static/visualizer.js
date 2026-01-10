@@ -81,11 +81,18 @@ window.onload = () => {
     console.log("cursor="+cursor+", parsed delta="+d);
 
     // 평가 막대 범위 설정
-    const maxEval = 10;  // 필요하면 맞춰 조정
-    const normalized = Math.min(Math.max((d + maxEval)/(2*maxEval),0),1);
+    const minEval = -10; // 0%
+    const maxEval = 10;  // 100%, 필요하면 조정
+    // 평가값 정규화: minEval -> 0, maxEval -> 100%
+    let normalized = (d - minEval) / (maxEval - minEval);
+
+    // clamp 0~1
+    normalized = Math.max(0, Math.min(1, normalized));
 
     bar.style.height = (normalized*100) + "%";
     bar.style.background = d >= 0 ? "black" : "white";
+
+    console.log(`cursor=${cursor}, delta=${d}, normalized=${normalized}`);
 }
 
     function redraw() {
