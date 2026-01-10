@@ -1,7 +1,7 @@
 import os
 import re
 import logging
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, redirect, jsonify
 from tools.chess_tool import run as chess_run
 from tools.evaluator import evaluate_pgn
 from tools.convert import convert_pgn_to_txt
@@ -131,3 +131,4 @@ def log_visit():
     timestamp = data.get("timestamp", "unknown")
     logging.info(f"VISIT: {timestamp}")  # 이게 render.com 로그에 뜸
     return jsonify({"status": "ok"})
+
