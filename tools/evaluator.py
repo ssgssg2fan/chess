@@ -31,7 +31,7 @@ def is_sacrifice(board, move):
         return False
     return mover.piece_type > captured.piece_type
 
-def classify_move(board, chosen, scored, post_eval, pre_eval):
+def classify_move(board, chosen, scored, post_eval):
     best_mv, best_eval = scored[0]
     second_eval = scored[1][1] if len(scored) > 1 else best_eval
 
@@ -41,22 +41,22 @@ def classify_move(board, chosen, scored, post_eval, pre_eval):
         return "블런더(??)", 3, delta
 
     if chosen == best_mv:
-        if abs(pre_eval - second_eval) >= 150:
+        if abs(best_eval - second_eval) >= 150:
             if is_sacrifice(board, chosen):
                 return "탁월(!!)", 0, delta
             return "훌륭(!)", 0, delta
         return "최고(★)", 0, delta
         
     if not chosen == best_mv:
-        if abs(pre_eval - second_eval) >= 150:
+        if abs(best_eval - second_eval) >= 150:
             return "놓친 수(x)", 0, delta
-        if abs(pre_eval - post_eval) <= 20:
+        if abs(best_eval - post_eval) <= 20:
             return "우수한 수(👍)", 0, delta
         return
         
-    if abs(pre_eval - post_eval) <= 100:
+    if abs(best_eval - post_eval) <= 100:
         return "부정확한 수(?!)", 0, delta
-    if abs(pre_eval - post_eval) < 500:
+    if abs(best_eval - post_eval) < 500:
         return "실수(?)", 0, delta
         
     return "ordinary(..)", 0, delta
@@ -130,7 +130,7 @@ def evaluate_pgn(
             # =====================
             # 4. 분류
             # =====================
-            label, penalty, delta = classify_move(board, move, scored, post_eval, pre_eval)
+            label, penalty, delta = classify_move(board, move, scored, post_eval)
 
             mistake_points += penalty
             move_count += 1
