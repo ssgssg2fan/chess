@@ -45,5 +45,12 @@
         <button type="submit">Show Moves</button>
     </form>
 
+    <h2>기보 깔끔하게 변환(txt pgn 가능)</h2>
+    <form action="/convert" method="post" enctype="multipart/form-data">
+      <input type="file" name="file" accept=".pgn" required>
+      <br>
+      <button type="submit">변환하기</button>
+    </form>
+    
 </body>
 </html>
