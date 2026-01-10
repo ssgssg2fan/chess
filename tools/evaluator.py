@@ -158,8 +158,6 @@ def evaluate_pgn(
     engine.quit()
     return out_path
 
-            time.sleep(0.1)
-
         final_accuracy = max(0.0, (1 - mistake_points / move_count) * 100)
         out.write("\n=== 최종 정확도 ===\n")
         out.write(f"Accuracy: {final_accuracy:.1f}%\n")
