@@ -10,13 +10,13 @@
 
     <!-- Chess Tool 이동 -->
     <button onclick="location.href='/chess'">
-        explane
+        설명
     </button>
 
     <hr>
 
     <!-- PGN 평가 -->
-    <h2>Evaluate PGN</h2>
+    <h2>변환된 기보 평가</h2>
     <form action="/evaluate" method="post" enctype="multipart/form-data">
         <input type="file" name="file" required>
         <br><br>
@@ -38,18 +38,18 @@
     <hr>
 
     <!-- PGN 시각화 -->
-    <h2>Visualize Moves</h2>
+    <h2>평가된 기보 시각화</h2>
     <form action="/visualize" method="post" enctype="multipart/form-data">
         <input type="file" name="file" required>
         <br><br>
         <button type="submit">Show Moves</button>
     </form>
 
-    <h2>ggibo byoun hwan(txt pgn ganung)</h2>
+    <h2>기보 변환(txt pgn 가능)</h2>
     <form action="/convert" method="post" enctype="multipart/form-data">
       <input type="file" name="file" accept=".pgn" required>
       <br>
-      <button type="submit">byoun hwan</button>
+      <button type="submit">변환</button>
     </form>
     
 </body>
