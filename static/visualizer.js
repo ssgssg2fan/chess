@@ -97,10 +97,15 @@ window.onload = () => {
     console.log(`cursor=${cursor}, delta=${d}, normalized=${normalized}`);
 }
     function drawTag() {
-  const box = document.getElementById("tag-box");
-  if (!box) return;
-  box.textContent = tags[cur] || "";
-  console.log(`[TAG] move ${cursor}: ${tag}`);
+    if (cursor === 0) {
+        console.log("[TAG] start position");
+        return;
+    }
+
+    const move = moves[cursor - 1];
+    const tagText = move.label || "";
+
+    console.log("[TAG]", tagText);
 }
 
     function redraw() {
