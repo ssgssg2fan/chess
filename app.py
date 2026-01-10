@@ -99,7 +99,25 @@ def index():
 def chess():
     result = chess_run()
     return render_template("chess.html", result=result)
+    
+@app.route("/convert", methods=["POST"])
+def convert():
+    if "file" not in request.files:
+        return "NO FILE", 400
 
+    file = request.files["file"]
+    if file.filename == "":
+        return "EMPTY FILE", 400
+
+    filepath = os.path.join(UPLOAD_DIR, file.filename)
+    file.save(filepath)
+
+    txt_path = convert_pgn_to_txt(filepath)
+    if not txt_path:
+        return "CONVERSION FAILED", 500
+
+    return send_file(txt_path, as_attachment=True)
+    
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
