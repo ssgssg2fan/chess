@@ -41,22 +41,22 @@ def classify_move(board, chosen, scored, post_eval):
         return "블런더(??)", 3, delta
 
     if chosen == best_mv:
-        if abs( pre_eval - second_eval ) >= 150:
+        if abs(pre_eval - second_eval) >= 150:
             if is_sacrifice(board, chosen):
                 return "탁월(!!)", 0, delta
             return "훌륭(!)", 0, delta
         return "최고(★)", 0, delta
         
     if not chosen == best_mv:
-        if abs( pre_eval - second_eval ) >= 150:
+        if abs(pre_eval - second_eval) >= 150:
             return "놓친 수(x)", 0, delta
-        if abs( pre_eval - post_eval ) <= 20:
+        if abs(pre_eval - post_eval) <= 20:
             return "우수한 수(👍)", 0, delta
         return
         
-    if abs( pre_eval - post_eval ) <= 100:
+    if abs(pre_eval - post_eval) <= 100:
         return "부정확한 수(?!)", 0, delta
-    if abs( pre_eval - post_eval ) < 500:
+    if abs(pre_eval - post_eval) < 500:
         return "실수(?)", 0, delta
         
     return "ordinary(..)", 0, delta
