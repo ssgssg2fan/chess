@@ -126,7 +126,7 @@ if __name__ == "__main__":
 
 @app.route("/log_visit", methods=["POST"])
 def log_visit():
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    ip = request.remote_addr
-    print(f"[VISIT] {timestamp} - {ip}")  # Render 로그에 찍힘
-    return "OK", 200
+    data = request.get_json()
+    timestamp = data.get("timestamp", "unknown")
+    logging.info(f"VISIT: {timestamp}")  # 이게 render.com 로그에 뜸
+    return jsonify({"status": "ok"})
