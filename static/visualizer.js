@@ -100,6 +100,7 @@ window.onload = () => {
   const box = document.getElementById("tag-box");
   if (!box) return;
   box.textContent = tags[cur] || "";
+  console.log(`[TAG] move ${cursor}: ${tag}`);
 }
 
     function redraw() {
