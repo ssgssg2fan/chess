@@ -31,7 +31,7 @@ def is_sacrifice(board, move):
         return False
     return mover.piece_type > captured.piece_type
 
-def classify_move(board, chosen, scored, post_eval):
+def classify_move(board, chosen, scored, post_eval, pre_eval):
     best_mv, best_eval = scored[0]
     second_eval = scored[1][1] if len(scored) > 1 else best_eval
 
@@ -109,6 +109,7 @@ def evaluate_pgn(
                 if "pv" in pv and pv["pv"]:
                     scored.append((pv["pv"][0], safe_cp(pv["score"])))
             scored.sort(key=lambda x: x[1], reverse=True)
+            pre_eval = safe_cp(pre_info[0]["score"])
 
             # =====================
             # 2. 수 두기
@@ -129,7 +130,7 @@ def evaluate_pgn(
             # =====================
             # 4. 분류
             # =====================
-            label, penalty, delta = classify_move(board, move, scored, post_eval)
+            label, penalty, delta = classify_move(board, move, scored, post_eval, pre_eval)
 
             mistake_points += penalty
             move_count += 1
