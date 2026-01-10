@@ -1,10 +1,27 @@
 import os
+import logging
 import re
 from flask import Flask, render_template, request, send_file
 from tools.chess_tool import run as chess_run
 from tools.evaluator import evaluate_pgn
 from tools.convert import convert_pgn_to_txt
 
+LOG_FILE = "/tmp/access.log"
+os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+
+# 로깅 설정
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.INFO,
+    format="%(asctime)s %(message)s"
+)
+
+from flask import request
+
+@app.before_request
+def log_request():
+    logging.info(f"{request.remote_addr} {request.method} {request.path} {request.user_agent}")
+    
 UPLOAD_DIR = "/tmp/uploads"
 RESULT_DIR = "/tmp/results"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
