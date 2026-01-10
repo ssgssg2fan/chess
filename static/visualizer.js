@@ -98,14 +98,14 @@ window.onload = () => {
 }
     function drawTag() {
     if (cursor === 0) {
-        console.log("[TAG] start position");
+        console.log("[label] start position");
         return;
     }
 
     const move = moves[cursor - 1];
     const tagText = move.label || "";
 
-    console.log("[TAG]", tagText);
+    console.log("[label]", tagText);
 }
 
     function redraw() {
