@@ -6,6 +6,8 @@ from tools.chess_tool import run as chess_run
 from tools.evaluator import evaluate_pgn
 from tools.convert import convert_pgn_to_txt
 
+app = Flask(__name__, static_folder="static")
+
 LOG_FILE = "/tmp/access.log"
 os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
 
@@ -20,14 +22,13 @@ from flask import request
 
 @app.before_request
 def log_request():
-    logging.info(f"{request.remote_addr} {request.method} {request.path} {request.user_agent}")
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    logging.info(f"[{now}] {request.remote_addr} {request.method} {request.path} {request.user_agent}")
     
 UPLOAD_DIR = "/tmp/uploads"
 RESULT_DIR = "/tmp/results"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(RESULT_DIR, exist_ok=True)
-
-app = Flask(__name__, static_folder="static")
 
 @app.route("/evaluate", methods=["POST"])
 def evaluate():
