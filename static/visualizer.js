@@ -94,11 +94,23 @@ window.onload = () => {
 
     console.log(`cursor=${cursor}, delta=${d}, normalized=${normalized}`);
 }
+    function drawTag() {
+  const box = document.getElementById("tag-box");
+
+  if (cursor === 0) {
+    box.textContent = "";
+    return;
+  }
+
+  const move = moves[cursor - 1];
+  box.textContent = move.label;
+}
 
     function redraw() {
     drawBoard();
     drawMoves();
     drawEval();
+    drawTag();
     }
     
 // nextMove/prevMove 통합
