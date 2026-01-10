@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, send_file
 from tools.chess_tool import run as chess_run
 from tools.evaluator import evaluate_pgn
 from tools.convert import convert_pgn_to_txt
+from datetime import datetime
 
 UPLOAD_DIR = "/tmp/uploads"
 RESULT_DIR = "/tmp/results"
@@ -122,3 +123,10 @@ def convert():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+@app.route("/log_visit", methods=["POST"])
+def log_visit():
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ip = request.remote_addr
+    print(f"[VISIT] {timestamp} - {ip}")  # Render 로그에 찍힘
+    return "OK", 200
