@@ -1,47 +1,49 @@
+# tools/convert.py
 import re
 import os
+from werkzeug.utils import secure_filename
 
 def clean_pgn_moves(pgn_text: str) -> str:
-    """
-    PGN 텍스트에서 시간표시, 코멘트 제거 후 공백 정리
-    """
-    # Remove clock annotations {[%clk ...]}
+    # 시계 주석 제거
     cleaned = re.sub(r"\{\[%clk.*?\]\}", "", pgn_text)
-    # Remove comments {}
+    # 일반 주석 제거
     cleaned = re.sub(r"\{.*?\}", "", cleaned)
-    # Remove multiple spaces
+    # 연속 공백 제거
     cleaned = re.sub(r"\s+", " ", cleaned)
     return cleaned.strip()
 
-def convert_pgn_to_txt(pgn_path: str) -> str | None:
+def convert_pgn_to_txt(pgn_path: str, save_dir: str = None) -> str:
     """
-    PGN 파일을 받아 TXT로 변환 후 경로 반환
+    PGN 파일을 받아서 클린한 TXT 파일로 저장하고 경로 반환
+    save_dir: TXT 저장 경로 (없으면 pgn과 같은 폴더)
     """
+    if not os.path.exists(pgn_path):
+        raise FileNotFoundError("PGN 파일 경로가 존재하지 않습니다.")
 
-        return None
-
-    # Load raw PGN
+    # PGN 로드
     with open(pgn_path, "r", encoding="utf-8") as f:
         raw = f.read()
 
-    # Split into games
+    # 게임 단위 분리 (빈 줄 기준)
     games = raw.split("\n\n")
 
     cleaned_games = []
     for g in games:
-        # Skip metadata lines like [Event "..."]
+        # [Event ...] 등 메타데이터 제거
         moves_only = "\n".join(line for line in g.split("\n") if not line.startswith("["))
         cleaned_games.append(clean_pgn_moves(moves_only))
 
-    # Save as TXT
-    txt_path = pgn_path.replace(".pgn", ".txt")
+    # 저장 경로
+    if save_dir:
+        os.makedirs(save_dir, exist_ok=True)
+        txt_path = os.path.join(save_dir, secure_filename(os.path.basename(pgn_path).replace(".pgn", ".txt")))
+    else:
+        txt_path = pgn_path.replace(".pgn", ".txt")
+
+    # TXT로 저장
     with open(txt_path, "w", encoding="utf-8") as f:
         for g in cleaned_games:
             if g.strip():
                 f.write(g + "\n\n")
 
     return txt_path
-
-if __name__ == "__main__":
-    pgn_path = input("PGN 파일 경로 넣어라: ").strip()
-    convert_pgn_to_txt(pgn_path)
