@@ -48,7 +48,7 @@ window.onload = () => {
             const B = moves[i+1];
             const line = document.createElement("div");
             line.className = "move" + (i===cursor-1 ? " active" : "");
-            line.textContent = `${(i/2+1)}. ${W.san} [${W.label}]` + (B ? ` ${B.san} [${B.label}]` : "");
+            line.textContent = `${(i/2+1)}. ${W.san} ` + (B ? ` ${B.san} ` : "");
             div.appendChild(line);
         }
     }
