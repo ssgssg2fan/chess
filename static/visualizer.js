@@ -1,8 +1,9 @@
+
 window.onload = () => {
     const game = new Chess();
     const moves = window.MOVES;
     const boardDiv = document.getElementById("board"); // ✅ 여기 선언
-    
+    let tags = [];
     let cursor = 0;
     let lastMove = null;
 
