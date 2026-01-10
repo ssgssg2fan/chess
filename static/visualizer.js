@@ -90,7 +90,7 @@ window.onload = () => {
     normalized = Math.max(0, Math.min(1, normalized));
 
     bar.style.height = (normalized*100) + "%";
-    bar.style.background = d >= 0 ? "white" : "black" ;
+    bar.style.background = "black";
 
     console.log(`cursor=${cursor}, delta=${d}, normalized=${normalized}`);
 }
