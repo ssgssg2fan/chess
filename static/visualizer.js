@@ -1,18 +1,15 @@
 window.onload = () => {
     const game = new Chess();
     const moves = window.MOVES;
-    const boardDiv = document.getElementById("board"); // ✅ 여기 선언
-    let tags = [];
-    let cur = 0;
+    const boardDiv = document.getElementById("board");
     let cursor = 0;
-    const mv = game.move(moves[cursor].san); // mv.from, mv.to가 알파벳+숫자 e2, e4 같은 문자열일 수 있음
-    lastMove = { from: mv.from, to: mv.to };
+    let lastMove = null;
 
     const HIGHLIGHT_COLORS = {
-    excellent: { dark: "#1A66CC", light: "#33CCFF" }, // 탁월
-    missed:    { dark: "#f00",    light: "#ec5353" }, // 놓친 수
-    blunder:   { dark: "#b81414", light: "#e61919" }, // 블런더
-    normal:    { dark: "#ded119", light: "#ff0" }     // 기타
+        excellent: { dark: "#1A66CC", light: "#33CCFF" },
+        missed:    { dark: "#f00",    light: "#ec5353" },
+        blunder:   { dark: "#b81414", light: "#e61919" },
+        normal:    { dark: "#ded119", light: "#ff0" }
     };
 
     function isDarkGroup(file, rank) {
@@ -27,37 +24,33 @@ window.onload = () => {
         bb: "/static/pieces/bb.png", br: "/static/pieces/br.png",
         bq: "/static/pieces/bq.png", bk: "/static/pieces/bk.png"
     };
-    
+
     function drawBoard() {
-    boardDiv.innerHTML = "";
+        boardDiv.innerHTML = "";
+        const boardState = game.board();
 
-    for (let r = 7; r >= 0; r--) {
-        for (let f = 0; f < 8; f++) {
-            const cell = document.createElement("div");
-            const isWhite = (r + f) % 2 === 0;
-            cell.className = "cell " + (isWhite ? "green" : "white");
+        for (let r = 7; r >= 0; r--) {
+            for (let f = 0; f < 8; f++) {
+                const cell = document.createElement("div");
+                const isWhite = (r + f) % 2 === 0;
+                cell.className = "cell " + (isWhite ? "green" : "white");
 
-            const fileIndex = 7 - f;
-            const sq = r * 8 + fileIndex;
+                // 좌표 저장
+                cell.dataset.file = f;
+                cell.dataset.rank = r;
 
-            // 좌표 저장 (하이라이트용)
-            cell.dataset.file = fileIndex;
-            cell.dataset.rank = r;
+                const p = boardState[r][f];
+                if (p) {
+                    cell.innerHTML = `<img src="${PIECE_IMAGES[p.color + p.type]}" style="width:100%;height:100%;">`;
+                }
 
-            const boardState = game.board();
-            const p = boardState[r][fileIndex];
-            if (p) {
-                cell.innerHTML = `<img src="${PIECE_IMAGES[p.color + p.type]}" style="width:100%;height:100%;">`;
+                boardDiv.appendChild(cell);
             }
-
-            boardDiv.appendChild(cell);
         }
+
+        highlightLastMove();
     }
 
-    highlightLastMove();
-}
-
-    
     function drawMoves() {
         const div = document.getElementById("moves");
         div.innerHTML = "";
@@ -70,116 +63,75 @@ window.onload = () => {
             div.appendChild(line);
         }
     }
-    
+
     function drawEval() {
-    const bar = document.getElementById("evalfill");
-    if(cursor === 0){
-        bar.style.height = "50%";
+        const bar = document.getElementById("evalfill");
+        if(cursor === 0){
+            bar.style.height = "50%";
+            bar.style.background = "white";
+            return;
+        }
+        const moveObj = moves[cursor-1];
+        let dStr = String(moveObj.delta || "0");
+        const match = dStr.match(/-?\d+(\.\d+)?/);
+        let d = match ? parseFloat(match[0]) : 0;
+        const minEval = -10, maxEval = 10;
+        let normalized = (d - minEval) / (maxEval - minEval);
+        normalized = Math.max(0, Math.min(1, normalized));
+        bar.style.height = (normalized*100) + "%";
         bar.style.background = "white";
-        console.log("cursor=0, raw delta='0', parsed delta=0");
-        return;
     }
 
-    // moves 배열에서 현재 move 문자열 전체 확인
-    const moveObj = moves[cursor-1];
-    console.log("cursor="+cursor+", full move object:", moveObj);
-
-    // delta 문자열 가져오기
-    let dStr = moveObj.delta;  // ex: "슥슥0.32이"
-    console.log("cursor="+cursor+", raw delta='"+dStr+"'");
-
-    // 문자열 아닌 경우 처리
-    if(typeof dStr !== "string") dStr = String(dStr);
-
-    // 숫자 부분만 추출
-    const match = dStr.match(/-?\d+(\.\d+)?/);
-    let d = 0;
-    if(match) d = parseFloat(match[0]);
-
-    console.log("cursor="+cursor+", parsed delta="+d);
-
-    // 평가 막대 범위 설정
-    const minEval = -10; // 0%
-    const maxEval = 10;  // 100%, 필요하면 조정
-    // 평가값 정규화: minEval -> 0, maxEval -> 100%
-    let normalized = (d - minEval) / (maxEval - minEval);
-
-    // clamp 0~1
-    normalized = Math.max(0, Math.min(1, normalized));
-
-    bar.style.height = (normalized*100) + "%";
-    bar.style.background = "white";
-
-    console.log(`cursor=${cursor}, delta=${d}, normalized=${normalized}`);
-}
     function drawTag() {
-    const box = document.getElementById("tag-box");
-    if (!box) return;
-
-    if (cursor === 0) {
-        box.textContent = "";
-        return;
+        const box = document.getElementById("tag-box");
+        box.textContent = (cursor === 0) ? "" : moves[cursor-1].label || "";
     }
 
-    box.textContent = moves[cursor - 1].label;
-}
     function highlightLastMove() {
-    if (!lastMove || cursor === 0) return;
+        if (!lastMove || cursor === 0) return;
 
-    const label = moves[cursor - 1].label || "";
-    let type = "normal";
+        const moveObj = moves[cursor-1];
+        const label = moveObj.label || "";
+        let type = "normal";
+        if (label.includes("탁월")) type = "excellent";
+        else if (label.includes("놓친")) type = "missed";
+        else if (label.includes("블런더")) type = "blunder";
 
-    if (label.includes("탁월")) type = "excellent";
-    else if (label.includes("놓친")) type = "missed";
-    else if (label.includes("블런더")) type = "blunder";
+        const colors = HIGHLIGHT_COLORS[type];
 
-    const colors = HIGHLIGHT_COLORS[type];
+        document.querySelectorAll(".cell").forEach(cell => {
+            const f = Number(cell.dataset.file);
+            const r = Number(cell.dataset.rank);
 
-    document.querySelectorAll(".cell").forEach(cell => {
-        const file = Number(cell.dataset.file);
-        const rank = Number(cell.dataset.rank);
-        const sq = rank * 8 + file;
+            // Chess.js from/to는 e2, e4 같은 문자열
+            const fromFile = lastMove.from.charCodeAt(0)-'a'.charCodeAt(0);
+            const fromRank = parseInt(lastMove.from[1])-1;
+            const toFile = lastMove.to.charCodeAt(0)-'a'.charCodeAt(0);
+            const toRank = parseInt(lastMove.to[1])-1;
 
-        if (sq !== lastMove.from && sq !== lastMove.to) return;
-
-        const dark = isDarkGroup(file, rank);
-        cell.style.background = dark ? colors.dark : colors.light;
-    });
-}
-
-    function applyHighlight(cell, type, squareColor) {
-    const colors = HIGHLIGHT_COLORS[type];
-    if (!colors) return;
-
-    const color = squareColor === "dark"
-      ? colors.dark
-      : colors.light;
-
-    cell.style.setProperty("--highlight-color", color);
-    cell.classList.add("highlighted");
-  }
-
+            if ((f===fromFile && r===fromRank) || (f===toFile && r===toRank)) {
+                const dark = isDarkGroup(f,r);
+                const color = dark ? colors.dark : colors.light;
+                cell.style.background = color;
+                console.log("Highlight applied to", cell, "color:", color);
+            }
+        });
+    }
 
     function redraw() {
-    drawBoard();
-    drawMoves();
-    drawEval();
-    drawTag();
-    applyHighlight();
-    }
-    
-// nextMove/prevMove 통합
-    function nextMove() {
-        if(cursor >= moves.length) return;
-        const mv = game.move(moves[cursor].san);
-        lastMove = { from: mv.from, to: mv.to };
-        cursor++;
-        console.log('--highlight-color')
         drawBoard();
         drawMoves();
         drawEval();
         drawTag();
-        applyHighlight();
+    }
+
+    function nextMove() {
+        if(cursor >= moves.length) return;
+        const mv = game.move(moves[cursor].san);
+        if(!mv) { console.error("Invalid move at", cursor); return; }
+        lastMove = { from: mv.from, to: mv.to };
+        cursor++;
+        redraw();
     }
 
     function prevMove() {
@@ -187,14 +139,8 @@ window.onload = () => {
         game.undo();
         cursor--;
         lastMove = null;
-        console.log('--highlight-color')
-        drawBoard();
-        drawMoves();
-        drawEval();
-        drawTag();
-        applyHighlight();
+        redraw();
     }
-
 
     document.getElementById("next").onclick = nextMove;
     document.getElementById("prev").onclick = prevMove;
