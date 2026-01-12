@@ -97,9 +97,16 @@ window.onload = () => {
     console.log(`cursor=${cursor}, delta=${d}, normalized=${normalized}`);
 }
     function drawTag() {
-    if (cursor === 0) return;
-    console.log(moves[cursor - 1].label);
+    const box = document.getElementById("tag-box");
+    if (!box) return;
+
+    if (cursor === 0) {
+        box.textContent = "";
+        return;
     }
+
+    box.textContent = moves[cursor - 1].label;
+}
 
 
     function redraw() {
