@@ -98,12 +98,21 @@ window.onload = () => {
 }
     function drawTag() {
     const box = document.getElementById("tag-box");
-    if (!box) return;
+    if (!box) {
+        console.log("NO TAG BOX");
+        return;
+    }
 
-    if (cursor === 0) {
+    console.log("cursor:", cursor);
+    console.log("moves[cursor-1]:", moves[cursor - 1]);
+
+    if (cursor === 0 || !moves[cursor - 1]) {
         box.textContent = "";
         return;
     }
+
+    box.textContent = moves[cursor - 1].label;
+}
 
     box.textContent = moves[cursor - 1].label;
 }
