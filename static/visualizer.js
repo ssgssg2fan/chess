@@ -105,10 +105,10 @@ window.onload = () => {
 
             // Chess.js from/to는 e2, e4 같은 문자열
             // Chess.js 좌표 -> 화면 좌표
-            const fromFile = lastMove.to.charCodeAt(0)-'a'.charCodeAt(0);
-            const fromRank = parseInt(lastMove.to[1])-1;
-            const toFile = lastMove.from.charCodeAt(0)-'a'.charCodeAt(0);
-            const toRank = parseInt(lastMove.from[1])-1;
+            const fromFile = 7 - (lastMove.from.charCodeAt(0)-'a'.charCodeAt(0));
+            const fromRank = lastMove.from[1]-1; // rank 그대로
+            const toFile   = 7 - (lastMove.to.charCodeAt(0)-'a'.charCodeAt(0));
+            const toRank   = lastMove.to[1]-1;
 
             if ((f===fromFile && r===fromRank) || (f===toFile && r===toRank)) {
                 const dark = isDarkGroup(f,r);
