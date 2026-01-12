@@ -38,11 +38,11 @@ body {
   width:60px; height:60px;
   text-align:center; line-height:60px; font-size:36px;
   margin:0; padding:0;
+  --highlight-color: transparent;
 }
 .white { background:#f0f0f0; }
 .green { background:#76a86b; }
-.highlight { background: var(cell.style.setProperty); }
-
+.highlight { box-shadow: inset 0 0 0 4px var(--highlight-color); }
 #panel { width:260px; }
 
 #evalbar {
