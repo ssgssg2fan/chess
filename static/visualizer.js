@@ -5,7 +5,8 @@ window.onload = () => {
     let tags = [];
     let cur = 0;
     let cursor = 0;
-    let lastMove = null;
+    const mv = game.move(moves[cursor].san); // mv.from, mv.to가 알파벳+숫자 e2, e4 같은 문자열일 수 있음
+    lastMove = { from: mv.from, to: mv.to };
 
     const HIGHLIGHT_COLORS = {
     excellent: { dark: "#1A66CC", light: "#33CCFF" }, // 탁월
