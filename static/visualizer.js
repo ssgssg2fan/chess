@@ -7,6 +7,17 @@ window.onload = () => {
     let cursor = 0;
     let lastMove = null;
 
+    const HIGHLIGHT_COLORS = {
+    excellent: { dark: "#1A66CC", light: "#33CCFF" }, // 탁월
+    missed:    { dark: "#f00",    light: "#ec5353" }, // 놓친 수
+    blunder:   { dark: "#b81414", light: "#e61919" }, // 블런더
+    normal:    { dark: "#ded119", light: "#ff0" }     // 기타
+    };
+
+    function isDarkGroup(file, rank) {
+        return (file % 2 === rank % 2);
+    }
+
     const PIECE_IMAGES = {
         wp: "/static/pieces/wp.png", wn: "/static/pieces/wn.png",
         wb: "/static/pieces/wb.png", wr: "/static/pieces/wr.png",
@@ -17,29 +28,34 @@ window.onload = () => {
     };
     
     function drawBoard() {
-            boardDiv.innerHTML = "";
-        for (let r = 7; r >= 0; r--) {
-            for (let f = 0; f < 8; f++) {
-                const cell = document.createElement("div");
-                const isWhite = (r + f) % 2 === 0;
-                cell.className = "cell " + (isWhite ? "green" : "white");
+    boardDiv.innerHTML = "";
 
-                // 좌우 반전 적용
-                const fileIndex = 7 - f;
+    for (let r = 7; r >= 0; r--) {
+        for (let f = 0; f < 8; f++) {
+            const cell = document.createElement("div");
+            const isWhite = (r + f) % 2 === 0;
+            cell.className = "cell " + (isWhite ? "green" : "white");
 
-                const sq = r*8 + fileIndex;
-                if(lastMove && (sq === lastMove.from || sq === lastMove.to)) {
-                    cell.classList.add("highlight");
-                }
-            
-                const boardState = game.board(); // 8x8 배열
-                const p = boardState[r][fileIndex]; 
-                if(p) cell.innerHTML = `<img src="${PIECE_IMAGES[p.color+p.type]}" style="width:100%;height:100%;">`;
+            const fileIndex = 7 - f;
+            const sq = r * 8 + fileIndex;
 
-                boardDiv.appendChild(cell);
+            // 좌표 저장 (하이라이트용)
+            cell.dataset.file = fileIndex;
+            cell.dataset.rank = r;
+
+            const boardState = game.board();
+            const p = boardState[r][fileIndex];
+            if (p) {
+                cell.innerHTML = `<img src="${PIECE_IMAGES[p.color + p.type]}" style="width:100%;height:100%;">`;
             }
+
+            boardDiv.appendChild(cell);
         }
     }
+
+    highlightLastMove();
+}
+
     
     function drawMoves() {
         const div = document.getElementById("moves");
@@ -106,6 +122,31 @@ window.onload = () => {
 
     box.textContent = moves[cursor - 1].label;
 }
+    function highlightLastMove() {
+    if (!lastMove || cursor === 0) return;
+
+    const label = moves[cursor - 1].label || "";
+    let type = "normal";
+
+    if (label.includes("탁월")) type = "excellent";
+    else if (label.includes("놓친")) type = "missed";
+    else if (label.includes("블런더")) type = "blunder";
+
+    const colors = HIGHLIGHT_COLORS[type];
+
+    document.querySelectorAll(".cell").forEach(cell => {
+        const file = Number(cell.dataset.file);
+        const rank = Number(cell.dataset.rank);
+        const sq = rank * 8 + file;
+
+        if (sq !== lastMove.from && sq !== lastMove.to) return;
+
+        const dark = isDarkGroup(file, rank);
+        cell.style.boxShadow =
+            `inset 0 0 0 5px ${dark ? colors.dark : colors.light}`;
+    });
+}
+
 
 
     function redraw() {
