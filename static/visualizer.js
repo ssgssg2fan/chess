@@ -130,7 +130,7 @@ window.onload = () => {
         if(cursor >= moves.length) return;
         const mv = game.move(moves[cursor].san);
         if(!mv) { console.error("Invalid move at", cursor); return; }
-        lastMove = { from: mv.from, to: mv.to };
+        lastMove = { from: mv.to, to: mv.from };
         cursor++;
         redraw();
     }
@@ -139,7 +139,7 @@ window.onload = () => {
         if(cursor <= 0) return;
         game.undo();
         cursor--;
-        lastMove = null;
+        lastMove = { from: mv.to, to: mv.from };
         redraw();
     }
 
