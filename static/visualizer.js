@@ -142,8 +142,7 @@ window.onload = () => {
         if (sq !== lastMove.from && sq !== lastMove.to) return;
 
         const dark = isDarkGroup(file, rank);
-        cell.style.boxShadow =
-            `inset 0 0 0 5px ${dark ? colors.dark : colors.light}`;
+        cell.style.background = dark ? colors.dark : colors.light;
     });
 }
 
