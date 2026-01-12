@@ -1,4 +1,3 @@
-
 window.onload = () => {
     const game = new Chess();
     const moves = window.MOVES;
@@ -98,21 +97,12 @@ window.onload = () => {
 }
     function drawTag() {
     const box = document.getElementById("tag-box");
-    if (!box) {
-        console.log("NO TAG BOX");
-        return;
-    }
+    if (!box) return;
 
-    console.log("cursor:", cursor);
-    console.log("moves[cursor-1]:", moves[cursor - 1]);
-
-    if (cursor === 0 || !moves[cursor - 1]) {
+    if (cursor === 0) {
         box.textContent = "";
         return;
     }
-
-    box.textContent = moves[cursor - 1].label;
-}
 
     box.textContent = moves[cursor - 1].label;
 }
@@ -134,6 +124,7 @@ window.onload = () => {
         drawBoard();
         drawMoves();
         drawEval();
+        drawTag();
     }
 
     function prevMove() {
@@ -144,6 +135,7 @@ window.onload = () => {
         drawBoard();
         drawMoves();
         drawEval();
+        drawTag();
     }
 
 
@@ -152,6 +144,3 @@ window.onload = () => {
 
     redraw();
 };
-
-
-
