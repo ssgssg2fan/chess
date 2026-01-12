@@ -98,7 +98,7 @@ window.onload = () => {
 }
     function drawTag() {
     if (cursor === 0) return;
-    console.log(label);
+    console.log(moves[cursor - 1].label);
     }
 
 
