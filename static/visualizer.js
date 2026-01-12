@@ -146,6 +146,17 @@ window.onload = () => {
     });
 }
 
+    function applyHighlight(cell, type, squareColor) {
+    const colors = HIGHLIGHT_COLORS[type];
+    if (!colors) return;
+
+    const color = squareColor === "dark"
+      ? colors.dark
+      : colors.light;
+
+    cell.style.setProperty("--highlight-color", color);
+    cell.classList.add("highlighted");
+  }
 
 
     function redraw() {
@@ -153,6 +164,7 @@ window.onload = () => {
     drawMoves();
     drawEval();
     drawTag();
+    applyHighlight();
     }
     
 // nextMove/prevMove 통합
@@ -165,6 +177,7 @@ window.onload = () => {
         drawMoves();
         drawEval();
         drawTag();
+        applyHighlight();
     }
 
     function prevMove() {
@@ -176,6 +189,7 @@ window.onload = () => {
         drawMoves();
         drawEval();
         drawTag();
+        applyHighlight();
     }
 
 
