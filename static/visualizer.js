@@ -36,7 +36,7 @@ window.onload = () => {
                 cell.className = "cell " + (isWhite ? "green" : "white");
 
                 // 좌표 저장
-                cell.dataset.file = f;
+                cell.dataset.file = 7 - f;
                 cell.dataset.rank = r;
 
                 const p = boardState[r][f];
@@ -90,7 +90,7 @@ window.onload = () => {
     function highlightLastMove() {
         if (!lastMove || cursor === 0) return;
 
-        const moveObj = moves[cursor-1];
+        const moveObj = moves[cursor];
         const label = moveObj.label || "";
         let type = "normal";
         if (label.includes("탁월")) type = "excellent";
@@ -139,7 +139,7 @@ window.onload = () => {
         if(cursor <= 0) return;
         game.undo();
         cursor--;
-        lastMove = { from: mv.to, to: mv.from };
+        lastMove = null;
         redraw();
     }
 
