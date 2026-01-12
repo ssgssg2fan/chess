@@ -173,6 +173,7 @@ window.onload = () => {
         const mv = game.move(moves[cursor].san);
         lastMove = { from: mv.from, to: mv.to };
         cursor++;
+        console.log.var(--highlight-color)
         drawBoard();
         drawMoves();
         drawEval();
@@ -185,6 +186,7 @@ window.onload = () => {
         game.undo();
         cursor--;
         lastMove = null;
+        console.log.var(--highlight-color)
         drawBoard();
         drawMoves();
         drawEval();
