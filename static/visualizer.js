@@ -4,6 +4,7 @@ window.onload = () => {
     const boardDiv = document.getElementById("board");
     let cursor = 0;
     let lastMove = null;
+    const takSound = new Audio("/static/move.mp3"); 
 
     const HIGHLIGHT_COLORS = {
         excellent: { dark: "#1A66CC", light: "#33CCFF" },
@@ -120,6 +121,10 @@ window.onload = () => {
             }
         });
     }
+    function playTak() { 
+        takSound.currentTime = 0; // 재생 위치를 0초로 돌려서 
+        takSound.play().catch(() => {}); // 즉시 재생 (에러 무시) 
+    }
 
     function redraw() {
         drawBoard();
@@ -134,6 +139,7 @@ window.onload = () => {
         if(!mv) { console.error("Invalid move at", cursor); return; }
         lastMove = { from: mv.to, to: mv.from };
         cursor++;
+        playTak();
         redraw();
     }
 
@@ -149,6 +155,7 @@ window.onload = () => {
             lastMove = { from: prev.from, to: prev.to };
         } else { // 맨 처음으로 돌아갔으면 하이라이트 없음 
             lastMove = null; } 
+        playTak();
         redraw(); 
     }
 
