@@ -90,7 +90,7 @@ window.onload = () => {
     function highlightLastMove() {
         if (!lastMove || cursor === 0) return;
 
-        const moveObj = moves[cursor];
+        const moveObj = moves[cursor - 1];
         const label = moveObj.label || "";
         let type = "normal";
         if (label.includes("탁월")) type = "excellent";
@@ -135,12 +135,19 @@ window.onload = () => {
         redraw();
     }
 
-    function prevMove() {
-        if(cursor <= 0) return;
-        game.undo();
-        cursor--;
-        lastMove = null;
-        redraw();
+    function prevMove() { 
+        if (cursor <= 0) return; 
+        
+        game.undo(); // 수를 무릅니다. 
+        cursor--; 
+        
+        if (cursor > 0) { // [중요] 뒤로 갔을 때, 그 이전의 수가 무엇이었는지 확인해야 합니다. // game.history({ verbose: true })를 쓰면 둔 수들의 상세 정보를 배열로 줍니다. 
+            const history = game.history({ verbose: true }); 
+            const prev = history[history.length - 1]; // 가장 마지막에 둔 수 
+            lastMove = { from: prev.from, to: prev.to };
+        } else { // 맨 처음으로 돌아갔으면 하이라이트 없음 
+            lastMove = null; } 
+        redraw(); 
     }
 
     document.getElementById("next").onclick = nextMove;
