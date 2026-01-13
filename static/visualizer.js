@@ -6,10 +6,10 @@ window.onload = () => {
     let lastMove = null;
 
     const HIGHLIGHT_COLORS = {
-        excellent: { dark: "#1A66CC", light: "#33CCFF" },
-        missed:    { dark: "#f00",    light: "#ec5353" },
-        blunder:   { dark: "#b81414", light: "#e61919" },
-        normal:    { dark: "#ded119", light: "#ff0" }
+        excellent: { light: "#1A66CC", dark: "#33CCFF" },
+        missed:    { light: "#f00",    dark: "#ec5353" },
+        blunder:   { light: "#b81414", dark: "#e61919" },
+        normal:    { light: "#ded119", dark: "#ff0" }
     };
 
     function isDarkGroup(file, rank) {
@@ -33,7 +33,7 @@ window.onload = () => {
             for (let f = 0; f < 8; f++) {
                 const cell = document.createElement("div");
                 const isWhite = (r + f) % 2 === 0;
-                cell.className = "cell " + (isWhite ? "green" : "white");
+                cell.className = "cell " + (isWhite ? "white" : "green");
 
                 // 좌표 저장
                 cell.dataset.file = 7 - f;
