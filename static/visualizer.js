@@ -6,10 +6,11 @@ window.onload = () => {
     let lastMove = null;
 
     const HIGHLIGHT_COLORS = {
-        excellent: { light: "#1A66CC", dark: "#33CCFF" },
-        missed:    { light: "#f00",    dark: "#ec5353" },
-        blunder:   { light: "#b81414", dark: "#e61919" },
-        normal:    { light: "#ded119", dark: "#ff0" }
+        excellent: { dark: "#1A66CC", light: "#33CCFF" },
+        missed:    { dark: "#f00",    light: "#ec5353" },
+        blunder:   { dark: "#b81414", light: "#e61919" },
+        omgomg:    { dark: "#0d4f75", light: "#147bb7" },
+        normal:    { dark: "#ded119", light: "#ff0" }
     };
 
     function isDarkGroup(file, rank) {
@@ -96,6 +97,7 @@ window.onload = () => {
         if (label.includes("탁월")) type = "excellent";
         else if (label.includes("놓친")) type = "missed";
         else if (label.includes("블런더")) type = "blunder";
+        else if (label.includes("훌륭")) type = "omgomg";
 
         const colors = HIGHLIGHT_COLORS[type];
 
